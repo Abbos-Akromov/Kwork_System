@@ -1,0 +1,39 @@
+from django.urls import path
+from . import views
+
+app_name = 'client'
+
+urlpatterns = [
+    path('register/',                         views.RegisterView.as_view(),       name='register'),
+    path('login/',                            views.LoginView.as_view(),          name='login'),
+    path('logout/',                           views.LogoutView.as_view(),         name='logout'),
+    path('verify-email/<uidb64>/<token>/',    views.EmailVerifyView.as_view(),    name='email_verify'),
+    path('dashboard/',                        views.dashboard,                    name='dashboard'),
+    path('',                                  views.dashboard,                    name='home'),
+    path('profile/edit/',                     views.ProfileUpdateView.as_view(),  name='profile_edit'),
+    path('profile/<str:username>/',           views.ProfileDetailView.as_view(),  name='profile_detail'),
+    path('password/change/',                  views.PasswordChangeView.as_view(), name='password_change'),
+    path('developers/',                       views.DeveloperListView.as_view(),  name='developer_list'),
+    path('services/',                         views.ServiceListView.as_view(),    name='service_list'),
+    path('services/<int:pk>/',                views.ServiceDetailView.as_view(),  name='service_detail'),
+    path('orders/create/<int:service_id>/',   views.OrderCreateView.as_view(),    name='order_create'),
+    path('orders/',                           views.OrderListView.as_view(),      name='order_list'),
+    path('orders/<uuid:pk>/',                 views.OrderDetailView.as_view(),    name='order_detail'),
+    path('orders/<uuid:pk>/accept/',          views.OrderAcceptView.as_view(),    name='order_accept'),
+    path('orders/<uuid:pk>/reject/',          views.OrderRejectView.as_view(),    name='order_reject'),
+    path('orders/<uuid:pk>/deliver/',         views.OrderDeliverView.as_view(),   name='order_deliver'),
+    path('orders/<uuid:pk>/complete/',        views.OrderCompleteView.as_view(),  name='order_complete'),
+    path('orders/<uuid:pk>/revision/',        views.OrderRevisionView.as_view(),  name='order_revision'),
+    path('orders/<uuid:pk>/dispute/',         views.OrderDisputeView.as_view(),   name='order_dispute'),
+    path('orders/<uuid:pk>/cancel/',          views.OrderCancelView.as_view(),    name='order_cancel'),
+    path('orders/<uuid:pk>/chat/',            views.ChatView.as_view(),           name='chat'),
+    path('payments/',                         views.PaymentHistoryView.as_view(), name='payments'),
+    path('reviews/create/<uuid:order_id>/',   views.ReviewCreateView.as_view(),   name='review_create'),
+    path('reviews/<int:pk>/edit/',            views.ReviewUpdateView.as_view(),   name='review_edit'),
+    path('complaints/create/',                views.ComplaintCreateView.as_view(), name='complaint_create'),
+    path('complaints/',                       views.ComplaintListView.as_view(),   name='complaint_list'),
+    path('notifications/',                    views.NotificationListView.as_view(), name='notifications'),
+    path('notifications/<int:pk>/read/',      views.MarkNotificationRead.as_view(), name='notif_read'),
+    path('notifications/read-all/',           views.MarkAllRead.as_view(),          name='notif_read_all'),
+    path('notifications/count/',             views.UnreadCountView.as_view(),      name='notif_count'),
+]
