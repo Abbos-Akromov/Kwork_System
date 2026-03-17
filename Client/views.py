@@ -78,25 +78,25 @@ class LoginView(View):
     def post(self, request):
         form = LoginForm(request.POST)
         if form.is_valid():
-            email    = form.cleaned_data['email']
+            email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user     = authenticate(request, username=email, password=password)
-            if user:
-                if user.is_blocked:
-                    messages.error(request, f'Akkauntingiz bloklangan: {user.block_reason or ""}')
-                    return render(request, 'auth/login.html', {'form': form})
-                login(request, user)
-                if not form.cleaned_data.get('remember_me'):
-                    request.session.set_expiry(0)
-                return redirect(request.GET.get('next', 'client:dashboard'))
+
             try:
-                u = User.objects.get(email=email)
-                if not u.is_active:
-                    messages.error(request, 'Email tasdiqlanmagan.')
+                user_obj = User.objects.get(email=email)
+                user = authenticate(request, username=user_obj.username, password=password)
+
+                if user:
+                    if user.is_blocked:
+                        messages.error(request, f'Akkauntingiz bloklangan: {user.block_reason or ""}')
+                        return render(request, 'auth/login.html', {'form': form})
+                    login(request, user)
+                    if not form.cleaned_data.get('remember_me'):
+                        request.session.set_expiry(0)
+                    return redirect(request.GET.get('next', 'client:dashboard'))
                 else:
-                    messages.error(request, 'Email yoki parol noto\'g\'ri.')
+                    messages.error(request, 'Parol noto\'g\'ri.')
             except User.DoesNotExist:
-                messages.error(request, 'Email yoki parol noto\'g\'ri.')
+                messages.error(request, 'Bunday emailga ega foydalanuvchi topilmadi.')
         return render(request, 'auth/login.html', {'form': form})
 
 
