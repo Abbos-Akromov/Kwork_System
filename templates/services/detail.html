@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ service.title }} - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        
+        <div class="lg:col-span-2 space-y-8">
+            <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm">
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" class="w-full aspect-video object-cover">
+                {% else %}
+                    <div class="w-full aspect-video bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                        <i class="fa-solid fa-image text-6xl text-gray-300"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="p-8 md:p-12">
+                    <h1 class="text-3xl font-black mb-6 leading-tight">{{ service.title }}</h1>
+                    <div class="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed">
+                        {{ service.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-700 shadow-sm">
+                <h3 class="text-xl font-bold mb-8">Foydalanuvchilar fikri</h3>
+                <div class="space-y-6">
+                    <div class="flex gap-4 border-b dark:border-gray-700 pb-6">
+                        <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-2xl flex-shrink-0"></div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-sm">Jasur Ahmedov</h4>
+                                <div class="flex text-orange-400 text-[10px]">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500">Ajoyib xizmat! Hammasi vaqtida va sifatli bajarildi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-100 dark:border-gray-700 shadow-xl sticky top-24">
+                <div class="mb-6">
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Xizmat narxi</p>
+                    <h2 class="text-4xl font-black text-blue-600">{{ service.price }} <span class="text-lg">UZS</span></h2>
+                </div>
+
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-center gap-3 text-sm font-medium">
+                        <i class="fa-solid fa-clock text-blue-500"></i>
+                        <span>Yetkazib berish: 3 kun</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm font-medium">
+                        <i class="fa-solid fa-rotate text-blue-500"></i>
+                        <span>Tuzatishlar: 2 marta</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm font-medium">
+                        <i class="fa-solid fa-circle-check text-green-500"></i>
+                        <span>Xavfsiz to'lov kafolati</span>
+                    </div>
+                </div>
+
+                <a href="{% url 'client:order_create' %}?service={{ service.id }}" class="block w-full text-center bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-500/20 mb-4">
+                    Hoziroq buyurtma berish
+                </a>
+                
+                <button class="w-full text-center py-3 border border-gray-200 dark:border-gray-700 rounded-2xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    Dasturchi bilan bog'lanish
+                </button>
+            </div>
+
+            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-3xl p-6 border border-dashed border-gray-200 dark:border-gray-700 text-center">
+                <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
+                    {{ service.author.username|first|upper }}
+                </div>
+                <h4 class="font-bold">{{ service.author.get_full_name|default:service.author.username }}</h4>
+                <p class="text-xs text-gray-400 mb-4 italic">Dasturchi (Top Rated)</p>
+                <a href="{% url 'client:profile_detail' service.author.pk %}" class="text-xs font-black text-blue-600 uppercase hover:underline">Profilni ko'rish</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Buyurtma berish - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-12 max-w-4xl mx-auto px-4">
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-black uppercase italic tracking-tighter">Yangi buyurtma yaratish</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">Loyiha tafsilotlarini aniq kiritish sifatli natija garovidir.</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {% csrf_token %}
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="space-y-5">
+                    {% for field in form %}
+                    <div class="flex flex-col">
+                        <label class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="text-[10px] text-gray-400 mt-1 italic">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-[10px] mt-1">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="bg-gray-900 text-white rounded-3xl p-8 sticky top-24 shadow-2xl">
+                <h3 class="font-bold text-xl mb-6">Xulosa</h3>
+                <div class="space-y-4 border-b border-gray-700 pb-6 mb-6">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Xizmat narxi:</span>
+                        <span class="font-bold">Kelishilgan</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Platforma haqi (5%):</span>
+                        <span class="font-bold text-green-400">0 UZS</span>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-8">
+                    <span class="font-bold">Jami:</span>
+                    <span class="text-2xl font-black text-blue-400">Hisoblanmoqda</span>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-black transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bolt"></i> Tasdiqlash
+                </button>
+                <p class="text-[10px] text-gray-500 text-center mt-4 italic">Tasdiqlash tugmasini bosish orqali siz platforma qoidalariga rozilik bildirasiz.</p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    input, textarea, select {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        border-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        background-color: transparent;
+        transition: all 0.3s;
+    }
+    .dark input, .dark textarea, .dark select {
+        border-color: #374151;
+        color: white;
+    }
+    input:focus { border-color: #3b82f6; outline: none; ring: 2px; }
+</style>
+{% endblock %}

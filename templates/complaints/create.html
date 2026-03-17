@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Shikoyat yuborish - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-16 max-w-2xl mx-auto px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-red-50 dark:border-red-900/10">
+        
+        <div class="text-center mb-10">
+            <div class="w-20 h-20 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-full flex items-center justify-center mx-auto text-3xl mb-6">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h1 class="text-3xl font-black uppercase italic tracking-tighter">Muammo haqida xabar berish</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">Biz har bir murojaatni diqqat bilan o'rganib chiqamiz.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="flex flex-col">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{{ field.label }}</label>
+                
+                {% if field.name == 'description' %}
+                    <textarea name="{{ field.name }}" rows="5" class="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-red-500 rounded-2xl p-4 text-sm outline-none transition-all" placeholder="Muammoni batafsil tushuntiring..."></textarea>
+                {% elif field.name == 'image' %}
+                    <div class="relative w-full">
+                        <input type="file" name="{{ field.name }}" id="file-upload" class="hidden">
+                        <label for="file-upload" class="flex items-center justify-center w-full p-4 bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer hover:border-red-500 transition">
+                            <span class="text-sm text-gray-500 dark:text-gray-400 font-medium"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Rasm yoki skrinshot yuklash</span>
+                        </label>
+                    </div>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+
+                {% if field.errors %}
+                    <p class="text-red-500 text-[10px] mt-1 font-bold">{{ field.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="pt-6">
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-black text-lg transition shadow-lg shadow-red-500/20">
+                    Shikoyatni yuborish
+                </button>
+                <p class="text-center text-[10px] text-gray-400 mt-4 italic">Murojaatingiz 24 soat ichida ko'rib chiqiladi.</p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Standart inputlar uchun stil */
+    input[type="text"], select {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        border-radius: 1rem;
+        border: 2px solid transparent;
+        background-color: #f9fafb;
+        outline: none;
+        transition: all 0.3s;
+    }
+    .dark input[type="text"], .dark select {
+        background-color: #111827;
+        color: white;
+    }
+    input:focus, select:focus {
+        border-color: #ef4444;
+    }
+</style>
+{% endblock %}

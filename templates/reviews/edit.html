@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Fikrni tahrirlash{% endblock %}
+
+{% block content %}
+<div class="py-16 max-w-2xl mx-auto px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[3rem] p-10 border border-dashed border-blue-200 dark:border-gray-700 shadow-sm">
+        <h2 class="text-xl font-black mb-8 italic flex items-center gap-3">
+            <i class="fa-solid fa-pen-nib text-blue-600"></i> Fikrni tahrirlash
+        </h2>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                {% for field in form %}
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="pt-6 border-t dark:border-gray-700 flex justify-between items-center">
+                <p class="text-xs text-gray-400 italic font-medium">Oxirgi tahrir: bugun</p>
+                <button type="submit" class="bg-gray-900 dark:bg-blue-600 text-white px-10 py-3 rounded-xl font-bold hover:opacity-90 transition">
+                    Saqlash
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Edit form inputlari uchun maxsus stil */
+    input, textarea, select {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 1.25rem;
+        border: 2px solid #f1f5f9;
+        background-color: transparent;
+        transition: all 0.2s;
+    }
+    .dark input, .dark textarea, .dark select {
+        border-color: #374151;
+        color: white;
+    }
+    input:focus, textarea:focus {
+        border-color: #3b82f6;
+        outline: none;
+    }
+</style>
+{% endblock %}

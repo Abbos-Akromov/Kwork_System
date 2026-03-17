@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Portfolio Ro'yxati{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="flex justify-between items-center mb-10">
+        <h1 class="text-3xl font-black italic uppercase">Portfolio (Barcha ishlar)</h1>
+        <a href="{% url 'client:portfolio_create' %}" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold text-sm">+ Yangi loyiha</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for item in portfolios %}
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm relative group">
+            <div class="h-48 rounded-2xl bg-gray-100 dark:bg-gray-700 mb-4 overflow-hidden">
+                {% if item.image %}<img src="{{ item.image.url }}" class="w-full h-full object-cover">{% endif %}
+            </div>
+            <h4 class="font-bold text-gray-800 dark:text-white">{{ item.title }}</h4>
+            <p class="text-xs text-gray-400 mt-1 mb-4">{{ item.category }}</p>
+            
+            <div class="flex gap-2">
+                <a href="{% url 'client:portfolio_update' item.pk %}" class="flex-1 py-2 text-center bg-gray-50 dark:bg-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 hover:text-blue-600 transition">Tahrirlash</a>
+                <a href="{% url 'client:portfolio_delete' item.pk %}" class="flex-1 py-2 text-center bg-gray-50 dark:bg-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-50 hover:text-red-600 transition">O'chirish</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-20 text-center text-gray-400 italic">Hech qanday ish topilmadi.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

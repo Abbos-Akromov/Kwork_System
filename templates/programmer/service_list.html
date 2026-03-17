@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Mening Xizmatlarim - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+        <div>
+            <h1 class="text-3xl font-black italic uppercase tracking-tighter">Mening Xizmatlarim</h1>
+            <p class="text-gray-500 dark:text-gray-400">Siz tomondan taklif qilinayotgan barcha xizmatlar ro'yxati.</p>
+        </div>
+        <a href="{% url 'client:service_create' %}" class="bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-sm hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">
+            + Yangi xizmat qo'shish
+        </a>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+        <table class="w-full text-left">
+            <thead class="bg-gray-50 dark:bg-gray-900/50">
+                <tr>
+                    <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Xizmat</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Narxi</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Holat</th>
+                    <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Amallar</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                {% for service in services %}
+                <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition">
+                    <td class="px-8 py-5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden">
+                                {% if service.image %}<img src="{{ service.image.url }}" class="w-full h-full object-cover">{% endif %}
+                            </div>
+                            <span class="font-bold text-sm">{{ service.title }}</span>
+                        </div>
+                    </td>
+                    <td class="px-8 py-5 font-black text-blue-600 text-sm">{{ service.price }} UZS</td>
+                    <td class="px-8 py-5">
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-[10px] font-black uppercase">Aktiv</span>
+                    </td>
+                    <td class="px-8 py-5 text-right">
+                        <div class="flex justify-end gap-2">
+                            <a href="{% url 'client:service_update' service.pk %}" class="w-9 h-9 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-500 hover:text-blue-600 transition">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </a>
+                            <a href="{% url 'client:service_delete' service.pk %}" class="w-9 h-9 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-500 hover:text-red-600 transition">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-8 py-20 text-center text-gray-400 italic">Hali xizmatlar qo'shilmagan.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

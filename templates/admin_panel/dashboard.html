@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Panel - Boshqaruv{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-6">
+        <h1 class="text-4xl font-black text-gray-900 dark:text-white">Admin Dashboard</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2 italic">Platformaning umumiy holati va nazorati.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl text-white shadow-xl shadow-blue-500/20">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white/20 rounded-2xl"><i class="fa-solid fa-users text-xl"></i></div>
+                <span class="text-xs font-bold bg-green-400/30 px-2 py-1 rounded-lg">+12%</span>
+            </div>
+            <p class="text-blue-100 text-sm font-medium">Jami foydalanuvchilar</p>
+            <h3 class="text-3xl font-black mt-1">1,248</h3>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-2xl"><i class="fa-solid fa-money-bill-trend-up text-xl"></i></div>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Platforma foydasi (10%)</p>
+            <h3 class="text-3xl font-black mt-1 text-green-600">14.5M <span class="text-sm">UZS</span></h3>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-2xl"><i class="fa-solid fa-gavel text-xl"></i></div>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Ochiq nizolar</p>
+            <h3 class="text-3xl font-black mt-1 text-red-600">7 ta</h3>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-2xl"><i class="fa-solid fa-layer-group text-xl"></i></div>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Jami xizmatlar</p>
+            <h3 class="text-3xl font-black mt-1">452 ta</h3>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-1 space-y-4">
+            <h3 class="text-lg font-bold mb-4">Tezkor boshqaruv</h3>
+            <a href="{% url 'client:user_list' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
+                <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center"><i class="fa-solid fa-user-gear"></i></div>
+                <span class="font-bold">Foydalanuvchilarni boshqarish</span>
+            </a>
+            <a href="{% url 'client:complaint_list' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
+                <div class="w-12 h-12 bg-red-50 dark:bg-red-900/10 text-red-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <span class="font-bold">Shikoyatlarni ko'rish</span>
+            </a>
+            <a href="{% url 'client:payment_list' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
+                <div class="w-12 h-12 bg-green-50 dark:bg-green-900/10 text-green-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-credit-card"></i></div>
+                <span class="font-bold">Tranzaksiyalar nazorati</span>
+            </a>
+        </div>
+
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                <h3 class="font-bold">Kutilayotgan shikoyatlar (Arbitraj)</h3>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-800 mb-3">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold">!</div>
+                        <div>
+                            <p class="font-bold text-sm">#ORD-4521 bo'yicha e'tiroz</p>
+                            <p class="text-xs text-gray-400 italic">Mijoz: Abbos, Dasturchi: Bekzod</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'client:arbitraj' %}" class="text-xs bg-white dark:bg-gray-700 px-4 py-2 rounded-lg font-bold shadow-sm">Ko'rib chiqish</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

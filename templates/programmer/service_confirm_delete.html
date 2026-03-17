@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Xizmatni o'chirish - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-20 max-w-xl mx-auto px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[3rem] p-10 border border-red-100 dark:border-red-900/20 text-center shadow-2xl">
+        <div class="w-20 h-20 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-3xl flex items-center justify-center mx-auto text-3xl mb-6">
+            <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+        <h2 class="text-2xl font-black mb-4">Xizmatni o'chirasizmi?</h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-8 italic">"{{ object.title }}" xizmati butunlay o'chiriladi. Bu amalni ortga qaytarib bo'lmaydi.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-black transition">
+                    Ha, o'chirilsin
+                </button>
+                <a href="{% url 'client:programmer_services' %}" class="flex-1 bg-gray-100 dark:bg-gray-700 py-4 rounded-2xl font-black transition">
+                    Bekor qilish
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

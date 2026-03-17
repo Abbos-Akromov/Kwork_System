@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Mening Buyurtmalarim{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="flex justify-between items-end mb-10">
+        <div>
+            <h1 class="text-3xl font-black uppercase italic tracking-tighter">Buyurtmalarim</h1>
+            <p class="text-gray-500 dark:text-gray-400">Barcha loyihalaringiz holati va tarixi.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+        {% for order in orders %}
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 hover:border-blue-300 transition">
+            <div class="flex items-center gap-6 w-full md:w-1/2">
+                <div class="w-16 h-16 bg-blue-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center text-blue-600 text-2xl font-bold">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg leading-tight">{{ order.service.title|default:"Maxsus buyurtma" }}</h3>
+                    <p class="text-xs text-gray-400 mt-1 uppercase font-bold tracking-widest">ID: #ORD-{{ order.id }}</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between w-full md:w-1/2 gap-4">
+                <div class="text-center">
+                    <p class="text-[10px] text-gray-400 uppercase font-black">Summa</p>
+                    <p class="font-bold">{{ order.amount }} UZS</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-[10px] text-gray-400 uppercase font-black">Holat</p>
+                    <span class="text-[10px] px-3 py-1 rounded-full font-black uppercase 
+                        {% if order.status == 'completed' %}bg-green-100 text-green-700
+                        {% elif order.status == 'pending' %}bg-amber-100 text-amber-700
+                        {% else %}bg-blue-100 text-blue-700{% endif %}">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+                <a href="{% url 'client:order_detail' order.pk %}" class="bg-gray-900 dark:bg-gray-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:opacity-80 transition">
+                    Batafsil
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-20 bg-gray-50 dark:bg-gray-800/50 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-gray-700">
+            <i class="fa-solid fa-folder-open text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-400 italic font-medium">Sizda hali buyurtmalar mavjud emas.</p>
+            <a href="{% url 'client:service_list' %}" class="text-blue-600 font-bold mt-4 inline-block hover:underline">Xizmatlarni ko'rish</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

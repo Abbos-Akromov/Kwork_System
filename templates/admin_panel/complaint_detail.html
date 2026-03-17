@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Shikoyat tafsiloti #{{ complaint.id }}{% endblock %}
+
+{% block content %}
+<div class="py-8 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4">
+            <a href="{% url 'client:complaint_list' %}" class="w-10 h-10 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-sm border border-gray-100 dark:border-gray-700 hover:bg-gray-50 transition">
+                <i class="fa-solid fa-chevron-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-black">Shikoyat #{{ complaint.id }}</h1>
+                <p class="text-xs text-gray-500 uppercase tracking-widest font-bold">{{ complaint.created_at|date:"d F, Y | H:i" }}</p>
+            </div>
+        </div>
+        <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tighter {% if complaint.is_resolved %}bg-green-100 text-green-700{% else %}bg-amber-100 text-amber-700{% endif %}">
+            {% if complaint.is_resolved %}Hal qilingan{% else %}Kutilmoqda{% endif %}
+        </span>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-2xl flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-circle-user"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 font-bold uppercase">Shikoyat muallifi</p>
+                    <h4 class="font-bold text-lg">{{ complaint.user.get_full_name|default:complaint.user.username }}</h4>
+                </div>
+            </div>
+            <a href="{% url 'client:user_detail' complaint.user.pk %}" class="text-sm font-bold text-blue-600 hover:underline">Profilni ko'rish</a>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-100 dark:border-gray-700 shadow-sm">
+            <h3 class="text-sm text-gray-400 font-black uppercase mb-4 tracking-widest">Mavzu: {{ complaint.subject }}</h3>
+            <div class="prose dark:prose-invert max-w-none">
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg italic">
+                    "{{ complaint.description }}"
+                </p>
+            </div>
+            
+            {% if complaint.image %}
+            <div class="mt-8">
+                <p class="text-xs text-gray-400 font-bold uppercase mb-3">Ilova qilingan rasm/skrinshot:</p>
+                <img src="{{ complaint.image.url }}" class="rounded-2xl max-h-96 w-auto border dark:border-gray-700" alt="Shikoyat rasmi">
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="bg-gray-900 rounded-3xl p-8 text-white shadow-xl">
+            <h3 class="font-bold mb-4">Admin qarori</h3>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <textarea placeholder="Foydalanuvchiga javob yozing yoki ichki qayd qoldiring..." class="w-full bg-gray-800 border-gray-700 rounded-2xl p-4 text-sm focus:ring-blue-500 outline-none min-h-[120px]"></textarea>
+                
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <button type="submit" name="action" value="resolve" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-check-double"></i> Hal qilindi deb belgilash
+                    </button>
+                    <button type="submit" name="action" value="reject" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-trash-can"></i> Rad etish
+                    </button>
+                    <button type="button" class="bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-xl font-bold text-sm transition">
+                        Foydalanuvchiga ogohlantirish yuborish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

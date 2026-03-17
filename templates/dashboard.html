@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Boshqaruv paneli - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight">Xush kelibsiz, {{ user.first_name }}! 👋</h1>
+            <p class="text-gray-500 dark:text-gray-400">Bugungi hisobotingiz va faoliyatlar bilan tanishing.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'client:order_create' %}" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-plus text-xs"></i> Buyurtma berish
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-blue-600 mb-4">
+                <i class="fa-solid fa-briefcase text-xl"></i>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Faol buyurtmalar</p>
+            <h3 class="text-2xl font-black mt-1">12 ta</h3>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-green-600 mb-4">
+                <i class="fa-solid fa-wallet text-xl"></i>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Balans</p>
+            <h3 class="text-2xl font-black mt-1">2,450,000 so'm</h3>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-xl flex items-center justify-center text-purple-600 mb-4">
+                <i class="fa-solid fa-star text-xl"></i>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Reyting</p>
+            <h3 class="text-2xl font-black mt-1">4.9</h3>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-xl flex items-center justify-center text-orange-600 mb-4">
+                <i class="fa-solid fa-message text-xl"></i>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Bildirishnomalar</p>
+            <h3 class="text-2xl font-black mt-1">5 ta yangi</h3>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="font-bold">Oxirgi buyurtmalar</h3>
+                <a href="{% url 'client:order_list' %}" class="text-blue-600 text-xs font-bold hover:underline">Hammasini ko'rish</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 text-xs uppercase">
+                        <tr>
+                            <th class="px-6 py-4">Loyiha nomi</th>
+                            <th class="px-6 py-4">Holat</th>
+                            <th class="px-6 py-4">Summa</th>
+                            <th class="px-6 py-4">Sana</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                            <td class="px-6 py-4 font-semibold text-sm text-blue-600">Telegram Bot yaratish</td>
+                            <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase">Jarayonda</span></td>
+                            <td class="px-6 py-4 text-sm">500,000 UZS</td>
+                            <td class="px-6 py-4 text-xs text-gray-500 uppercase">12 Mar 2026</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
+            <h3 class="font-bold mb-6 italic">Profil holati</h3>
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                    {{ user.username|first|upper }}
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg leading-tight">{{ user.get_full_name }}</h4>
+                    <p class="text-xs text-gray-400 italic">ID: #{{ user.id }}452</p>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 italic">Ma'lumotlar to'ldirilgan:</span>
+                    <span class="font-bold text-green-500">85%</span>
+                </div>
+                <div class="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+                    <div class="bg-green-500 h-full w-[85%]"></div>
+                </div>
+                <a href="{% url 'client:profile_edit' %}" class="block w-full text-center border border-blue-600 text-blue-600 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 hover:text-white transition mt-4">Profilni tahrirlash</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

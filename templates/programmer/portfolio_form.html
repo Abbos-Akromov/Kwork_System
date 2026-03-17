@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Portfolio Ishi - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-10 max-w-3xl mx-auto px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 shadow-sm border border-gray-100 dark:border-gray-700">
+        <h1 class="text-3xl font-black italic uppercase mb-8">
+            {% if form.instance.pk %}Ishni tahrirlash{% else %}Yangi ish qo'shish{% endif %}
+        </h1>
+        
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 gap-6">
+                {% for field in form %}
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="text-red-500 text-[10px] mt-1 font-bold">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="pt-8 flex gap-4">
+                <button type="submit" class="flex-1 bg-gray-900 dark:bg-blue-600 text-white py-4 rounded-2xl font-black hover:opacity-90 transition">
+                    Saqlash
+                </button>
+                <a href="{% url 'client:portfolio_manage' %}" class="px-8 py-4 bg-gray-100 dark:bg-gray-700 rounded-2xl font-bold">Bekor qilish</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input, textarea, select {
+        width: 100%; padding: 1rem; border-radius: 1.25rem; border: 2px solid #f1f5f9; background-color: #f8fafc; outline: none; transition: all 0.3s;
+    }
+    .dark input, .dark textarea, .dark select { background-color: #111827; border-color: #111827; color: white; }
+    input:focus { border-color: #3b82f6; background-color: transparent; }
+</style>
+{% endblock %}

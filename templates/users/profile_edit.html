@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Profilni tahrirlash{% endblock %}
+
+{% block content %}
+<div class="py-10 max-w-3xl mx-auto px-4">
+    <div class="flex items-center gap-4 mb-8">
+        <a href="{% url 'client:profile_detail' user.pk %}" class="text-gray-400 hover:text-blue-600 transition"><i class="fa-solid fa-chevron-left"></i></a>
+        <h1 class="text-2xl font-bold">Profil sozlamalari</h1>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for field in form %}
+                <div class="flex flex-col {% if field.name == 'bio' %}md:col-span-2{% endif %}">
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="text-red-500 text-[10px] mt-1 italic">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-10 flex flex-col md:flex-row gap-4 border-t pt-8 dark:border-gray-700">
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">
+                    O'zgarishlarni saqlash
+                </button>
+                <a href="{% url 'client:password_change' %}" class="flex-1 bg-gray-100 dark:bg-gray-700 text-center py-3 rounded-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                    Parolni o'zgartirish
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    input, select, textarea {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        border-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        background-color: transparent;
+        transition: all 0.3s;
+        font-size: 0.95rem;
+    }
+    .dark input, .dark select, .dark textarea {
+        border-color: #374151;
+        background-color: #1f2937;
+        color: white;
+    }
+    input:focus, textarea:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+</style>
+{% endblock %}

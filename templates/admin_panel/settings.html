@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Sozlamalar{% endblock %}
+
+{% block content %}
+<div class="py-8 max-w-4xl mx-auto">
+    <h2 class="text-3xl font-black mb-8 italic">Platforma Sozlamalari</h2>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <form method="post" class="divide-y divide-gray-100 dark:divide-gray-700">
+            {% csrf_token %}
+            <div class="p-8 flex justify-between items-center">
+                <div>
+                    <h4 class="font-bold">Platforma komissiyasi</h4>
+                    <p class="text-sm text-gray-400">Har bir buyurtmadan olinadigan foiz.</p>
+                </div>
+                <input type="number" value="10" class="w-24 px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600">
+            </div>
+            <div class="p-8 flex justify-between items-center">
+                <div>
+                    <h4 class="font-bold text-red-600">Texnik ishlar rejimi</h4>
+                    <p class="text-sm text-gray-400">Yoqilsa, foydalanuvchilar saytga kira olmaydi.</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                </label>
+            </div>
+            <div class="p-8 bg-gray-50 dark:bg-gray-900/50 flex justify-end">
+                <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition">Saqlash</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

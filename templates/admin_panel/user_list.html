@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Foydalanuvchilar ro'yxati - Admin{% endblock %}
+
+{% block content %}
+<div class="py-8">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <h2 class="text-2xl font-black italic uppercase tracking-widest">Foydalanuvchilar nazorati</h2>
+        <div class="relative w-full md:w-96">
+            <input type="text" placeholder="Ism yoki ID bo'yicha qidirish..." class="w-full pl-12 pr-4 py-3 rounded-2xl border dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-gray-400"></i>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+        <table class="w-full text-left">
+            <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 text-xs uppercase font-bold">
+                <tr>
+                    <th class="px-6 py-4">Foydalanuvchi</th>
+                    <th class="px-6 py-4">Rol</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4">Ro'yxatdan o'tgan</th>
+                    <th class="px-6 py-4 text-center">Amallar</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                {% for user_item in users %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-100 dark:bg-gray-700 rounded-full flex items-center justify-center font-bold text-blue-600">
+                                {{ user_item.username|first|upper }}
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">{{ user_item.username }}</p>
+                                <p class="text-[10px] text-gray-400">{{ user_item.email }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-xs font-medium px-3 py-1 rounded-lg {% if user_item.is_staff %}bg-purple-100 text-purple-700{% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {% if user_item.is_staff %}Admin{% else %}Client/Prog{% endif %}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full {% if user_item.is_active %}bg-green-500{% else %}bg-red-500{% endif %}"></div>
+                            <span class="text-xs font-bold italic">{% if user_item.is_active %}Aktiv{% else %}Bloklangan{% endif %}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-gray-500 uppercase">{{ user_item.date_joined|date:"d M Y" }}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex justify-center gap-2">
+                            <a href="{% url 'client:user_detail' user_item.pk %}" class="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition"><i class="fa-solid fa-eye"></i></a>
+                            <button class="p-2 hover:bg-red-50 text-red-600 rounded-lg transition"><i class="fa-solid fa-ban"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

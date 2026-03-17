@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Fikr qoldirish - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-16 max-w-2xl mx-auto px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[3rem] p-10 shadow-2xl border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-600/5 rounded-full"></div>
+        
+        <div class="text-center mb-10">
+            <div class="w-20 h-20 bg-orange-50 dark:bg-orange-900/20 text-orange-500 rounded-3xl flex items-center justify-center mx-auto text-3xl mb-6 shadow-inner">
+                <i class="fa-solid fa-star-half-stroke"></i>
+            </div>
+            <h1 class="text-3xl font-black italic uppercase tracking-tighter">Tajribangiz bilan bo'lishing</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">Dasturchining ishi sizga ma'qul keldimi? Boshqalarga ham yordam bering.</p>
+        </div>
+
+        <form method="post" class="space-y-8">
+            {% csrf_token %}
+            
+            <div class="flex flex-col items-center">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Xizmat sifatini baholang</label>
+                <div class="flex gap-4 text-3xl text-gray-200 dark:text-gray-700">
+                    <button type="button" class="hover:text-orange-400 transition cursor-pointer star-btn" data-value="1"><i class="fa-solid fa-star"></i></button>
+                    <button type="button" class="hover:text-orange-400 transition cursor-pointer star-btn" data-value="2"><i class="fa-solid fa-star"></i></button>
+                    <button type="button" class="hover:text-orange-400 transition cursor-pointer star-btn" data-value="3"><i class="fa-solid fa-star"></i></button>
+                    <button type="button" class="hover:text-orange-400 transition cursor-pointer star-btn" data-value="4"><i class="fa-solid fa-star"></i></button>
+                    <button type="button" class="hover:text-orange-400 transition cursor-pointer star-btn" data-value="5"><i class="fa-solid fa-star"></i></button>
+                </div>
+                <input type="hidden" name="rating" id="id_rating" value="5">
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">Izohingiz</label>
+                <textarea name="comment" rows="4" placeholder="Ish jarayoni, muloqot va natija haqida yozing..." class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-2xl p-5 text-sm focus:ring-4 focus:ring-blue-500/10 outline-none transition-all italic"></textarea>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black transition shadow-lg shadow-blue-500/20">
+                    Fikrni yuborish
+                </button>
+                <a href="{% url 'client:order_list' %}" class="px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl font-bold hover:bg-gray-200 transition">
+                    Bekor qilish
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Yulduzchalar interaktivi
+    const stars = document.querySelectorAll('.star-btn');
+    const ratingInput = document.getElementById('id_rating');
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const val = this.getAttribute('data-value');
+            ratingInput.value = val;
+            
+            stars.forEach(s => {
+                if(s.getAttribute('data-value') <= val) {
+                    s.classList.add('text-orange-400');
+                    s.classList.remove('text-gray-200', 'dark:text-gray-700');
+                } else {
+                    s.classList.remove('text-orange-400');
+                    s.classList.add('text-gray-200', 'dark:text-gray-700');
+                }
+            });
+        });
+    });
+    // Default 5 yulduz
+    stars[4].click();
+</script>
+{% endblock %}

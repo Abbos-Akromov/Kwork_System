@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Xizmatni tahrirlash{% else %}Yangi xizmat qo'shish{% endif %}{% endblock %}
+
+{% block content %}
+<div class="py-10 max-w-4xl mx-auto px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 shadow-sm border border-gray-100 dark:border-gray-700">
+        <h1 class="text-3xl font-black italic uppercase mb-10">{% if form.instance.pk %}Xizmatni tahrirlash{% else %}Xizmat yaratish{% endif %}</h1>
+        
+        <form method="post" enctype="multipart/form-data" class="space-y-8">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="md:col-span-2 flex flex-col">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Xizmat nomi (masalan: "Telegram bot yarataman")</label>
+                    {{ form.title }}
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Boshlang'ich narx (UZS)</label>
+                    {{ form.price }}
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Muqova rasmi (URL yoki Fayl)</label>
+                    {{ form.image }}
+                </div>
+
+                <div class="md:col-span-2 flex flex-col">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Batafsil ma'lumot (Mijoz nima oladi?)</label>
+                    {{ form.description }}
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-6">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black transition shadow-lg shadow-blue-500/20">
+                    Saqlash va e'lon qilish
+                </button>
+                <a href="{% url 'client:programmer_dashboard' %}" class="px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl font-bold hover:bg-gray-200 transition">
+                    Bekor qilish
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input, textarea, select {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 1.25rem;
+        border: 2px solid #f8fafc;
+        background-color: #f8fafc;
+        outline: none;
+        transition: all 0.3s;
+    }
+    .dark input, .dark textarea, .dark select {
+        background-color: #111827;
+        border-color: #111827;
+        color: white;
+    }
+    input:focus, textarea:focus {
+        border-color: #3b82f6;
+        background-color: transparent;
+    }
+</style>
+{% endblock %}

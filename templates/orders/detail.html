@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Buyurtma #{{ order.id }} tafsiloti{% endblock %}
+
+{% block content %}
+<div class="py-10 max-w-5xl mx-auto px-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <h1 class="text-2xl font-black italic">BUYURTMA #{{ order.id }}</h1>
+                <span class="px-3 py-1 bg-blue-600 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">{{ order.get_status_display }}</span>
+            </div>
+            <p class="text-sm text-gray-500 italic">{{ order.created_at|date:"d F, Y | H:i" }}</p>
+        </div>
+        <div class="flex gap-2">
+            <button class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition">Shikoyat qilish</button>
+            {% if order.status == 'completed' %}
+                <a href="{% url 'client:review_create' %}?order={{ order.id }}" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition">Fikr qoldirish</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 mb-8 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div class="relative flex justify-between">
+            <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-100 dark:bg-gray-700 -translate-y-1/2 z-0"></div>
+            <div class="absolute top-1/2 left-0 h-1 bg-blue-600 -translate-y-1/2 z-0 transition-all duration-500" style="width: 33%"></div>
+            
+            <div class="relative z-10 text-center">
+                <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-check text-xs"></i></div>
+                <p class="text-[10px] font-bold uppercase dark:text-gray-400">Yaratildi</p>
+            </div>
+            <div class="relative z-10 text-center">
+                <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-spinner fa-spin text-xs"></i></div>
+                <p class="text-[10px] font-bold uppercase dark:text-gray-400">Jarayonda</p>
+            </div>
+            <div class="relative z-10 text-center">
+                <div class="w-10 h-10 bg-gray-200 dark:bg-gray-700 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-flag-checkered text-xs"></i></div>
+                <p class="text-[10px] font-bold uppercase dark:text-gray-400">Yakunlandi</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-100 dark:border-gray-700 shadow-sm">
+                <h3 class="font-bold text-lg mb-4">Loyiha tavsifi</h3>
+                <p class="text-gray-600 dark:text-gray-300 leading-relaxed italic">
+                    {{ order.description }}
+                </p>
+                {% if order.file %}
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-file-arrow-down text-blue-600 text-xl"></i>
+                        <span class="text-sm font-medium">Ilova qilingan fayl</span>
+                    </div>
+                    <a href="{{ order.file.url }}" class="text-xs font-bold text-blue-600 hover:underline">Yuklab olish</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Buyurtma qiymati</p>
+                <h2 class="text-3xl font-black text-blue-600 mb-6">{{ order.amount }} <span class="text-sm">UZS</span></h2>
+                
+                <div class="border-t dark:border-gray-700 pt-6">
+                    <p class="text-xs text-gray-400 font-bold uppercase mb-4">Ijrochi</p>
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-600">
+                            {{ order.service.author.username|first|upper }}
+                        </div>
+                        <div class="text-left">
+                            <p class="font-bold text-sm">{{ order.service.author.username }}</p>
+                            <a href="{% url 'client:profile_detail' order.service.author.pk %}" class="text-[10px] text-blue-600 font-bold hover:underline">Profilni ko'rish</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
