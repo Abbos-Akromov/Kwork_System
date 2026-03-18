@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ other_user.get_full_name|default:other_user.username }} bilan chat - Free.uz{% endblock %}
+
+{% block content %}
+<div class="py-8 max-w-3xl mx-auto px-4">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-4 flex items-center gap-4">
+        <a href="{% url 'client:chat_list' %}" class="text-gray-400 hover:text-blue-600 transition">
+            <i class="fa-solid fa-arrow-left text-lg"></i>
+        </a>
+        <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-gray-700 flex items-center justify-center text-lg font-bold text-blue-600 overflow-hidden">
+            {% if other_user.avatar %}
+                <img src="{{ other_user.avatar.url }}" class="w-full h-full object-cover">
+            {% else %}
+                {{ other_user.username|first|upper }}
+            {% endif %}
+        </div>
+        <div>
+            <h2 class="font-black">{{ other_user.get_full_name|default:other_user.username }}</h2>
+            <p class="text-xs text-gray-400">@{{ other_user.username }}</p>
+        </div>
+        <a href="{% url 'client:profile_detail' other_user.username %}" class="ml-auto text-xs text-blue-600 font-bold hover:underline">
+            Profil
+        </a>
+    </div>
+
+    <!-- Messages -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-4 min-h-[400px] max-h-[500px] overflow-y-auto flex flex-col gap-3" id="messages-box">
+        {% for msg in msgs %}
+            <div class="flex {% if msg.sender == user %}justify-end{% else %}justify-start{% endif %}">
+                <div class="max-w-[70%] {% if msg.sender == user %}bg-blue-600 text-white{% else %}bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white{% endif %} rounded-2xl px-4 py-3">
+                    {% if msg.text %}
+                        <p class="text-sm">{{ msg.text }}</p>
+                    {% endif %}
+                    {% if msg.file %}
+                        <a href="{{ msg.file.url }}" target="_blank" class="text-xs underline flex items-center gap-1 mt-1">
+                            <i class="fa-solid fa-paperclip"></i> Fayl
+                        </a>
+                    {% endif %}
+                    <p class="text-[10px] mt-1 {% if msg.sender == user %}text-blue-200{% else %}text-gray-400{% endif %}">
+                        {{ msg.created_at|date:"H:i" }}
+                    </p>
+                </div>
+            </div>
+        {% empty %}
+            <div class="flex-1 flex items-center justify-center text-gray-400 italic text-sm">
+                Hali xabar yo'q. Birinchi bo'lib yozing! 👋
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Input -->
+    <form method="post" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-3 flex gap-3 items-end">
+        {% csrf_token %}
+        <div class="flex-1">
+            <textarea name="text" rows="1" placeholder="Xabar yozing..."
+                class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 dark:text-white border-none outline-none resize-none focus:ring-2 focus:ring-blue-500 transition text-sm"
+                oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        </div>
+        <label class="cursor-pointer p-3 text-gray-400 hover:text-blue-600 transition">
+            <i class="fa-solid fa-paperclip text-lg"></i>
+            <input type="file" name="file" class="hidden">
+        </label>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-bold transition shadow-lg shadow-blue-500/20">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </form>
+</div>
+
+<script>
+    // Avtomatik pastga scroll
+    const box = document.getElementById('messages-box');
+    if (box) box.scrollTop = box.scrollHeight;
+</script>
+{% endblock %}

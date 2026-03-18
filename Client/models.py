@@ -362,16 +362,30 @@ class Review(models.Model):
 
 
 class ChatRoom(models.Model):
-    order      = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='chatroom')
-    created_at = models.DateTimeField(auto_now_add=True)
+    order       = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='chatroom', blank=True, null=True)
+    participant1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chatrooms_as_p1', blank=True, null=True)
+    participant2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chatrooms_as_p2', blank=True, null=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Chat xonasi'
         verbose_name_plural = 'Chat xonalari'
 
     def __str__(self):
-        return f'Chat — {self.order}'
+        if self.order:
+            return f'Chat — {self.order}'
+        return f'Chat — {self.participant1} & {self.participant2}'
 
+    @classmethod
+    def get_or_create_direct(cls, user1, user2):
+        room = cls.objects.filter(
+            participant1=user1, participant2=user2
+        ).first() or cls.objects.filter(
+            participant1=user2, participant2=user1
+        ).first()
+        if not room:
+            room = cls.objects.create(participant1=user1, participant2=user2)
+        return room
 
 class Message(models.Model):
     room       = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages')

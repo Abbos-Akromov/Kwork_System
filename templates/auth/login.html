@@ -4,22 +4,51 @@
 
 {% block content %}
 <section class="flex items-center justify-center py-20 px-4">
-    <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-center mb-6">Xush kelibsiz!</h2>
-        <form method="post" class="space-y-4">
+    <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 border border-gray-100 dark:border-gray-700">
+        <h2 class="text-3xl font-black text-center mb-2 italic italic uppercase tracking-tighter">Xush kelibsiz!</h2>
+        <p class="text-center text-gray-500 text-sm mb-8">Tizimga kirish uchun ma'lumotlarni kiriting.</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-4 rounded-xl bg-red-50 text-red-600 text-sm font-bold border border-red-100">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="space-y-5">
             {% csrf_token %}
             <div>
-                <label class="block text-sm font-medium mb-1">Foydalanuvchi nomi</label>
-                <input type="text" name="username" class="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">
+                    Email yoki foydalanuvchi nomi
+                </label>
+                <input
+                    type="text"
+                    name="login"
+                    placeholder="example@mail.com yoki username"
+                    class="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400 border-none focus:ring-2 focus:ring-blue-500 outline-none transition"
+                    required
+                >
             </div>
             <div>
-                <label class="block text-sm font-medium mb-1">Parol</label>
-                <input type="password" name="password" class="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Parol</label>
+                <input type="password" name="password" placeholder="••••••••" class="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-none focus:ring-2 focus:ring-blue-500 outline-none transition" required>
             </div>
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">Kirish</button>
+
+            <div class="flex items-center justify-between px-1">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="remember_me" class="rounded text-blue-600">
+                    <span class="text-xs text-gray-500 font-medium">Eslab qolish</span>
+                </label>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black transition shadow-lg shadow-blue-500/20 uppercase tracking-widest text-sm">
+                Kirish
+            </button>
         </form>
-        <p class="text-center mt-6 text-sm text-gray-500">
-            Akkountingiz yo'qmi? <a href="{% url 'client:register' %}" class="text-blue-600 font-bold">Ro'yxatdan o'ting</a>
+
+        <p class="text-center mt-8 text-sm text-gray-500 italic">
+            Akkountingiz yo'qmi? <a href="{% url 'client:register' %}" class="text-blue-600 font-black not-italic">Ro'yxatdan o'ting</a>
         </p>
     </div>
 </section>

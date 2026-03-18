@@ -29,7 +29,8 @@
                 <div class="text-right">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-widest italic">Reyting</p>
                     <div class="flex items-center text-orange-400 gap-1 font-black">
-                        <i class="fa-solid fa-star"></i> 4.8
+                        <i class="fa-solid fa-star"></i>
+                        {{ developer.avg_rating|default:"—" }}
                     </div>
                 </div>
             </div>
@@ -38,14 +39,21 @@
             <p class="text-xs text-gray-400 mb-4 line-clamp-2 italic">{{ developer.bio|default:"Python/Django Backend Dasturchi" }}</p>
             
             <div class="flex flex-wrap gap-2 mb-6">
-                <span class="text-[10px] font-bold px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md uppercase">Python</span>
-                <span class="text-[10px] font-bold px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md uppercase">Django</span>
-                <span class="text-[10px] font-bold px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md uppercase">PostgreSQL</span>
+                {% for skill in developer.skills %}
+                    <span class="text-[10px] font-bold px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md uppercase">{{ skill }}</span>
+                {% empty %}
+                    <span class="text-[10px] text-gray-400 italic">Ko'nikmalar ko'rsatilmagan</span>
+                {% endfor %}
             </div>
             
             <div class="flex gap-2">
-                <a href="{% url 'client:profile_detail' developer.pk %}" class="flex-1 text-center py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20">Profil</a>
-                <a href="#" class="w-12 flex items-center justify-center border border-gray-100 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <a href="{% url 'client:profile_detail' developer.username %}"
+                   class="flex-1 text-center py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20">
+                    Profil
+                </a>
+                <a href="{% url 'client:direct_chat' developer.username %}"
+                   class="w-12 flex items-center justify-center border border-gray-100 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                   title="Xabar yuborish">
                     <i class="fa-solid fa-comment-dots text-gray-400"></i>
                 </a>
             </div>

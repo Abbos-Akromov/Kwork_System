@@ -12,7 +12,7 @@ from django.conf import settings
 from django.db.models import Q, Avg
 from django.db import transaction
 from PIL import Image
-
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .models import (
     User, Order, Delivery, Payment, Review,
     Complaint, Notification, ChatRoom, Message,
@@ -35,19 +35,12 @@ class RegisterView(View):
     def post(self, request):
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            uid   = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            url   = request.build_absolute_uri(f'/verify-email/{uid}/{token}/')
-            send_mail(
-                'Email manzilingizni tasdiqlang',
-                f'Salom {user.first_name}!\nTasdiqlash havolasi:\n{url}',
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=True,
-            )
-            messages.success(request, 'Ro\'yxatdan o\'tdingiz! Email tasdiqlash xabarini tekshiring.')
-            return redirect('client:login')
+            user = form.save(commit=False)
+            user.is_active = True
+            user.save()
+            login(request, user)
+            messages.success(request, 'Xush kelibsiz!')
+            return redirect('client:dashboard')
         return render(request, 'auth/register.html', {'form': form})
 
 
@@ -73,39 +66,61 @@ class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('client:dashboard')
-        return render(request, 'auth/login.html', {'form': LoginForm()})
+        return render(request, 'auth/login.html')
 
     def post(self, request):
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
+        login_input = request.POST.get('login')
+        password = request.POST.get('password')
+        remember = request.POST.get('remember_me')
 
-            try:
-                user_obj = User.objects.get(email=email)
-                user = authenticate(request, username=user_obj.username, password=password)
+        user_obj = None
 
-                if user:
-                    if user.is_blocked:
-                        messages.error(request, f'Akkauntingiz bloklangan: {user.block_reason or ""}')
-                        return render(request, 'auth/login.html', {'form': form})
-                    login(request, user)
-                    if not form.cleaned_data.get('remember_me'):
-                        request.session.set_expiry(0)
-                    return redirect(request.GET.get('next', 'client:dashboard'))
-                else:
-                    messages.error(request, 'Parol noto\'g\'ri.')
-            except User.DoesNotExist:
-                messages.error(request, 'Bunday emailga ega foydalanuvchi topilmadi.')
-        return render(request, 'auth/login.html', {'form': form})
+        if login_input:
+            if '@' in login_input:
+                try:
+                    user_obj = User.objects.get(email=login_input)
+                except User.DoesNotExist:
+                    user_obj = None
+            else:
+                try:
+                    user_obj = User.objects.get(username=login_input)
+                except User.DoesNotExist:
+                    user_obj = None
 
+        if user_obj:
+            if not user_obj.is_active:
+                messages.error(request, 'Akkauntingiz tasdiqlanmagan. Emailingizni tekshiring.')
+                return render(request, 'auth/login.html')
+
+            user = authenticate(
+                request,
+                email=user_obj.email,
+                password=password,
+                backend='django.contrib.auth.backends.ModelBackend'
+            )
+
+            if user is not None:
+                if hasattr(user, 'is_blocked') and user.is_blocked:
+                    messages.error(request, f'Akkauntingiz bloklangan: {user.block_reason or ""}')
+                    return render(request, 'auth/login.html')
+
+                auth_login(request, user)
+
+                if not remember:
+                    request.session.set_expiry(0)
+
+                return redirect(request.GET.get('next', 'client:dashboard'))
+            else:
+                messages.error(request, "Parol noto'g'ri.")
+        else:
+            messages.error(request, "Bunday foydalanuvchi topilmadi.")
+
+        return render(request, 'auth/login.html')
 
 class LogoutView(View):
     def post(self, request):
-        logout(request)
+        auth_logout(request)
         return redirect('client:login')
-
-
 
 
 
@@ -113,18 +128,22 @@ class LogoutView(View):
 def dashboard(request):
     user = request.user
     ctx = {}
+
     if user.is_client:
-        ctx['orders'] = Order.objects.filter(client=user).order_by('-created_at')[:5]
-        ctx['unread'] = Notification.objects.filter(recipient=user, is_read=False).count()
+        all_orders = Order.objects.filter(client=user)
     elif user.is_developer:
-        ctx['orders'] = Order.objects.filter(developer=user).order_by('-created_at')[:5]
-        ctx['unread'] = Notification.objects.filter(recipient=user, is_read=False).count()
+        all_orders = Order.objects.filter(developer=user)
+        avg = Review.objects.filter(developer=user).aggregate(avg=Avg('rating'))['avg']
+        ctx['avg_rating'] = round(avg, 1) if avg else 0
+    else:
+        all_orders = Order.objects.none()
+
+    ctx['active_orders_count'] = all_orders.filter(status='active').count()
+    ctx['completed_orders_count'] = all_orders.filter(status='completed').count()
+    ctx['orders'] = all_orders.order_by('-created_at')[:5]
+    ctx['unread'] = Notification.objects.filter(recipient=user, is_read=False).count()
+
     return render(request, 'dashboard.html', ctx)
-
-
-
-
-
 
 
 class ProfileUpdateView(View):
@@ -158,7 +177,7 @@ class ProfileUpdateView(View):
 class ProfileDetailView(View):
     def get(self, request, username):
         profile = get_object_or_404(User, username=username)
-        ctx = {'profile_user': profile}
+        ctx = {'target_user': profile}
         if profile.is_developer:
             ctx['services']   = Service.objects.filter(developer=profile, is_active=True)
             ctx['portfolio']  = PortfolioItem.objects.filter(developer=profile)
@@ -462,6 +481,57 @@ class ChatView(View):
             )
         return redirect('client:chat', pk=pk)
 
+class ChatListView(View):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('client:login')
+        rooms = ChatRoom.objects.filter(
+            Q(participant1=request.user) | Q(participant2=request.user)
+        ).order_by('-created_at')
+
+        rooms_data = []
+        for room in rooms:
+            other = room.participant2 if room.participant1 == request.user else room.participant1
+            last_msg = room.messages.last()
+            unread = room.messages.filter(is_read=False).exclude(sender=request.user).count()
+            rooms_data.append({
+                'room': room,
+                'other': other,
+                'last_msg': last_msg,
+                'unread': unread,
+            })
+
+        return render(request, 'chat/chat_list.html', {'rooms_data': rooms_data})
+
+
+class DirectChatView(View):
+    def get(self, request, username):
+        if not request.user.is_authenticated:
+            return redirect('client:login')
+        other = get_object_or_404(User, username=username)
+        if request.user == other:
+            return redirect('client:dashboard')
+        room = ChatRoom.get_or_create_direct(request.user, other)
+        msgs = room.messages.order_by('created_at')
+        room.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+        return render(request, 'chat/chat.html', {
+            'room': room, 'msgs': msgs, 'form': MessageForm(), 'other_user': other
+        })
+
+    def post(self, request, username):
+        if not request.user.is_authenticated:
+            return redirect('client:login')
+        other = get_object_or_404(User, username=username)
+        room = ChatRoom.get_or_create_direct(request.user, other)
+        form = MessageForm(request.POST, request.FILES)
+        if form.is_valid():
+            Message.objects.create(
+                room=room,
+                sender=request.user,
+                text=form.cleaned_data.get('text'),
+                file=form.cleaned_data.get('file'),
+            )
+        return redirect('client:direct_chat', username=username)
 
 
 class PaymentHistoryView(View):
@@ -584,7 +654,7 @@ class NotificationListView(View):
         paginator = Paginator(notifs, 20)
         page = request.GET.get('page')
         page_obj = paginator.get_page(page)
-        return render(request, 'notifications/list.html', {'page_obj': page_obj})
+        return render(request, 'notifications/list.html', {'page_obj': page_obj, 'notifications': page_obj})
 
 
 class MarkNotificationRead(View):
