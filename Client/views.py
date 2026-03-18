@@ -65,7 +65,10 @@ class EmailVerifyView(View):
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('client:dashboard')
+            if request.user.is_staff or request.user.role == 'admin':
+                return redirect('admin_panel:dashboard')
+            else:
+                return redirect('client:dashboard')
         return render(request, 'auth/login.html')
 
     def post(self, request):
@@ -109,7 +112,12 @@ class LoginView(View):
                 if not remember:
                     request.session.set_expiry(0)
 
-                return redirect(request.GET.get('next', 'client:dashboard'))
+                next_url = request.GET.get('next')
+                if next_url:
+                    return redirect(next_url)
+                if user.is_staff or user.role == 'admin':
+                    return redirect('admin_panel:dashboard')
+                return redirect('client:dashboard')
             else:
                 messages.error(request, "Parol noto'g'ri.")
         else:

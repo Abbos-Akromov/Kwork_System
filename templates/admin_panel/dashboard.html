@@ -9,74 +9,178 @@
         <p class="text-gray-500 dark:text-gray-400 mt-2 italic">Platformaning umumiy holati va nazorati.</p>
     </div>
 
+    <!-- Statistika kartalar -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl text-white shadow-xl shadow-blue-500/20">
-            <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-white/20 rounded-2xl"><i class="fa-solid fa-users text-xl"></i></div>
-                <span class="text-xs font-bold bg-green-400/30 px-2 py-1 rounded-lg">+12%</span>
-            </div>
+            <div class="p-3 bg-white/20 rounded-2xl w-fit mb-4"><i class="fa-solid fa-users text-xl"></i></div>
             <p class="text-blue-100 text-sm font-medium">Jami foydalanuvchilar</p>
-            <h3 class="text-3xl font-black mt-1">1,248</h3>
+            <h3 class="text-3xl font-black mt-1">{{ total_users }}</h3>
+            <p class="text-blue-200 text-xs mt-2">Bugun yangi: +{{ new_users_today }}</p>
         </div>
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
-            <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-2xl"><i class="fa-solid fa-money-bill-trend-up text-xl"></i></div>
+            <div class="p-3 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-2xl w-fit mb-4">
+                <i class="fa-solid fa-money-bill-trend-up text-xl"></i>
             </div>
-            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Platforma foydasi (10%)</p>
-            <h3 class="text-3xl font-black mt-1 text-green-600">14.5M <span class="text-sm">UZS</span></h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Platforma foydasi</p>
+            <h3 class="text-3xl font-black mt-1 text-green-600">{{ total_revenue|floatformat:0 }} <span class="text-sm">UZS</span></h3>
+            <p class="text-gray-400 text-xs mt-2">Kutilayotgan: {{ hold_amount|floatformat:0 }} UZS</p>
         </div>
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
-            <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-2xl"><i class="fa-solid fa-gavel text-xl"></i></div>
+            <div class="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-2xl w-fit mb-4">
+                <i class="fa-solid fa-gavel text-xl"></i>
             </div>
             <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Ochiq nizolar</p>
-            <h3 class="text-3xl font-black mt-1 text-red-600">7 ta</h3>
+            <h3 class="text-3xl font-black mt-1 text-red-600">{{ dispute_orders }} ta</h3>
+            <p class="text-gray-400 text-xs mt-2">Shikoyatlar: {{ pending_complaints }} ta</p>
         </div>
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
-            <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-2xl"><i class="fa-solid fa-layer-group text-xl"></i></div>
+            <div class="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-2xl w-fit mb-4">
+                <i class="fa-solid fa-briefcase text-xl"></i>
             </div>
-            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Jami xizmatlar</p>
-            <h3 class="text-3xl font-black mt-1">452 ta</h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Jami buyurtmalar</p>
+            <h3 class="text-3xl font-black mt-1">{{ total_orders }} ta</h3>
+            <p class="text-gray-400 text-xs mt-2">Faol: {{ active_orders }} | Kutilmoqda: {{ pending_orders }}</p>
+        </div>
+    </div>
+
+    <!-- Foydalanuvchilar statistikasi -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+            <i class="fa-solid fa-user text-blue-600 text-2xl mb-2"></i>
+            <p class="text-gray-500 text-sm">Mijozlar</p>
+            <h3 class="text-2xl font-black">{{ clients_count }}</h3>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+            <i class="fa-solid fa-code text-purple-600 text-2xl mb-2"></i>
+            <p class="text-gray-500 text-sm">Dasturchilar</p>
+            <h3 class="text-2xl font-black">{{ developers_count }}</h3>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+            <i class="fa-solid fa-ban text-red-600 text-2xl mb-2"></i>
+            <p class="text-gray-500 text-sm">Bloklangan</p>
+            <h3 class="text-2xl font-black text-red-600">{{ blocked_count }}</h3>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Tezkor boshqaruv -->
         <div class="lg:col-span-1 space-y-4">
             <h3 class="text-lg font-bold mb-4">Tezkor boshqaruv</h3>
             <a href="{% url 'admin_panel:user_list' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
-                <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center"><i class="fa-solid fa-user-gear"></i></div>
-                <span class="font-bold">Foydalanuvchilarni boshqarish</span>
+                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div>
+                    <span class="font-bold block">Foydalanuvchilar</span>
+                    <span class="text-xs text-gray-400">{{ total_users }} ta foydalanuvchi</span>
+                </div>
             </a>
-            <a href="{% url 'client:complaint_list' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
-                <div class="w-12 h-12 bg-red-50 dark:bg-red-900/10 text-red-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                <span class="font-bold">Shikoyatlarni ko'rish</span>
+            <a href="{% url 'admin_panel:complaint_list' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
+                <div class="w-12 h-12 bg-red-50 dark:bg-red-900/10 text-red-500 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <span class="font-bold block">Shikoyatlar</span>
+                    <span class="text-xs text-red-500">{{ pending_complaints }} ta kutilmoqda</span>
+                </div>
             </a>
-            <a href="{% url 'client:payment_list' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
-                <div class="w-12 h-12 bg-green-50 dark:bg-green-900/10 text-green-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-credit-card"></i></div>
-                <span class="font-bold">Tranzaksiyalar nazorati</span>
+            <a href="{% url 'admin_panel:payment_list' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
+                <div class="w-12 h-12 bg-green-50 dark:bg-green-900/10 text-green-500 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+                <div>
+                    <span class="font-bold block">Tranzaksiyalar</span>
+                    <span class="text-xs text-gray-400">{{ hold_amount|floatformat:0 }} UZS kutilmoqda</span>
+                </div>
+            </a>
+            <a href="{% url 'admin_panel:arbitraj' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
+                <div class="w-12 h-12 bg-orange-50 dark:bg-orange-900/10 text-orange-500 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-gavel"></i>
+                </div>
+                <div>
+                    <span class="font-bold block">Arbitraj</span>
+                    <span class="text-xs text-orange-500">{{ dispute_orders }} ta nizo</span>
+                </div>
+            </a>
+            <a href="{% url 'admin_panel:settings' %}" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:scale-[1.02] transition shadow-sm">
+                <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 text-gray-600 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-gear"></i>
+                </div>
+                <div>
+                    <span class="font-bold block">Sozlamalar</span>
+                    <span class="text-xs text-gray-400">Platforma sozlamalari</span>
+                </div>
             </a>
         </div>
 
+        <!-- Oxirgi buyurtmalar -->
         <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-                <h3 class="font-bold">Kutilayotgan shikoyatlar (Arbitraj)</h3>
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="font-bold">Oxirgi buyurtmalar</h3>
+                <span class="text-xs text-gray-400">Jami: {{ total_orders }} ta</span>
             </div>
-            <div class="p-6">
-                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-800 mb-3">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold">!</div>
-                        <div>
-                            <p class="font-bold text-sm">#ORD-4521 bo'yicha e'tiroz</p>
-                            <p class="text-xs text-gray-400 italic">Mijoz: Abbos, Dasturchi: Bekzod</p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 text-xs uppercase">
+                        <tr>
+                            <th class="px-4 py-3">Xizmat</th>
+                            <th class="px-4 py-3">Mijoz</th>
+                            <th class="px-4 py-3">Holat</th>
+                            <th class="px-4 py-3">Summa</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                        {% for order in recent_orders %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                            <td class="px-4 py-3 text-sm font-semibold text-blue-600">{{ order.service.title|truncatechars:25 }}</td>
+                            <td class="px-4 py-3 text-xs text-gray-500">{{ order.client.get_full_name|default:order.client.username }}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase
+                                    {% if order.status == 'active' %}bg-yellow-100 text-yellow-700
+                                    {% elif order.status == 'completed' %}bg-green-100 text-green-700
+                                    {% elif order.status == 'cancelled' %}bg-red-100 text-red-700
+                                    {% elif order.status == 'dispute' %}bg-orange-100 text-orange-700
+                                    {% elif order.status == 'pending' %}bg-blue-100 text-blue-700
+                                    {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm font-bold">{{ order.price|floatformat:0 }} UZS</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-4 py-8 text-center text-gray-400 italic text-sm">Buyurtmalar yo'q</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Oxirgi shikoyatlar -->
+            {% if recent_complaints %}
+            <div class="p-6 border-t border-gray-100 dark:border-gray-700">
+                <h4 class="font-bold mb-4 text-sm">Kutilayotgan shikoyatlar</h4>
+                <div class="space-y-3">
+                    {% for complaint in recent_complaints %}
+                    <div class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/10 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xs">!</div>
+                            <div>
+                                <p class="font-bold text-sm">{{ complaint.reporter.username }} → {{ complaint.reported_user.username }}</p>
+                                <p class="text-xs text-gray-400">{{ complaint.created_at|date:"d M Y" }}</p>
+                            </div>
                         </div>
+                        <a href="{% url 'admin_panel:complaint_detail' complaint.pk %}" class="text-xs bg-white dark:bg-gray-700 px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-gray-50 transition">
+                            Ko'rish
+                        </a>
                     </div>
-                    <a href="{% url 'client:arbitraj' %}" class="text-xs bg-white dark:bg-gray-700 px-4 py-2 rounded-lg font-bold shadow-sm">Ko'rib chiqish</a>
+                    {% endfor %}
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -118,7 +118,7 @@ class AdminUserListView(AdminRequiredMixin, View):
 
 class AdminUserDetailView(AdminRequiredMixin, View):
     def get(self, request, pk):
-        user = get_object_or_404(User, pk=pk)
+        user = get_object_or_404(User,   pk=pk)
         client_orders    = Order.objects.filter(client=user).order_by('-created_at')[:10]
         developer_orders = Order.objects.filter(developer=user).order_by('-created_at')[:10]
         payments         = Payment.objects.filter(

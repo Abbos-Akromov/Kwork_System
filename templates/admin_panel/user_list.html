@@ -1,15 +1,34 @@
 {% extends 'base.html' %}
-
 {% block title %}Foydalanuvchilar ro'yxati - Admin{% endblock %}
-
 {% block content %}
 <div class="py-8">
     <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <h2 class="text-2xl font-black italic uppercase tracking-widest">Foydalanuvchilar nazorati</h2>
-        <div class="relative w-full md:w-96">
-            <input type="text" placeholder="Ism yoki ID bo'yicha qidirish..." class="w-full pl-12 pr-4 py-3 rounded-2xl border dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
+        <form method="get" class="relative w-full md:w-96">
+            <input type="text" name="q" value="{{ q }}" placeholder="Ism, email yoki username..."
+                class="w-full pl-12 pr-4 py-3 rounded-2xl border dark:bg-gray-800 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none">
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-gray-400"></i>
-        </div>
+        </form>
+    </div>
+
+    <!-- Filterlar -->
+    <div class="flex flex-wrap gap-3 mb-6">
+        <a href="?{% if q %}q={{ q }}&{% endif %}"
+           class="px-4 py-2 rounded-xl text-sm font-bold {% if not role_filter %}bg-blue-600 text-white{% else %}bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700{% endif %}">
+            Barchasi
+        </a>
+        <a href="?{% if q %}q={{ q }}&{% endif %}role=client"
+           class="px-4 py-2 rounded-xl text-sm font-bold {% if role_filter == 'client' %}bg-blue-600 text-white{% else %}bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700{% endif %}">
+            Mijozlar
+        </a>
+        <a href="?{% if q %}q={{ q }}&{% endif %}role=developer"
+           class="px-4 py-2 rounded-xl text-sm font-bold {% if role_filter == 'developer' %}bg-blue-600 text-white{% else %}bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700{% endif %}">
+            Dasturchilar
+        </a>
+        <a href="?{% if q %}q={{ q }}&{% endif %}status=blocked"
+           class="px-4 py-2 rounded-xl text-sm font-bold {% if status_filter == 'blocked' %}bg-red-600 text-white{% else %}bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700{% endif %}">
+            Bloklangan
+        </a>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
@@ -24,41 +43,93 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                {% for user_item in users %}
+                {% for user_item in page_obj %}
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-blue-100 dark:bg-gray-700 rounded-full flex items-center justify-center font-bold text-blue-600">
-                                {{ user_item.username|first|upper }}
+                                {% if user_item.avatar %}
+                                    <img src="{{ user_item.avatar.url }}" class="w-full h-full object-cover rounded-full">
+                                {% else %}
+                                    {{ user_item.username|first|upper }}
+                                {% endif %}
                             </div>
                             <div>
-                                <p class="font-bold text-sm">{{ user_item.username }}</p>
+                                <p class="font-bold text-sm">{{ user_item.get_full_name|default:user_item.username }}</p>
                                 <p class="text-[10px] text-gray-400">{{ user_item.email }}</p>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="text-xs font-medium px-3 py-1 rounded-lg {% if user_item.is_staff %}bg-purple-100 text-purple-700{% else %}bg-gray-100 text-gray-700{% endif %}">
-                            {% if user_item.is_staff %}Admin{% else %}Client/Prog{% endif %}
+                        <span class="text-xs font-bold px-3 py-1 rounded-lg
+                            {% if user_item.role == 'admin' %}bg-purple-100 text-purple-700
+                            {% elif user_item.role == 'developer' %}bg-blue-100 text-blue-700
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ user_item.get_role_display }}
                         </span>
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full {% if user_item.is_active %}bg-green-500{% else %}bg-red-500{% endif %}"></div>
-                            <span class="text-xs font-bold italic">{% if user_item.is_active %}Aktiv{% else %}Bloklangan{% endif %}</span>
+                            {% if user_item.is_blocked %}
+                                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                                <span class="text-xs font-bold text-red-500">Bloklangan</span>
+                            {% elif user_item.is_active %}
+                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                <span class="text-xs font-bold text-green-500">Aktiv</span>
+                            {% else %}
+                                <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                                <span class="text-xs font-bold text-yellow-500">Tasdiqlanmagan</span>
+                            {% endif %}
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-xs text-gray-500 uppercase">{{ user_item.date_joined|date:"d M Y" }}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500">{{ user_item.date_joined|date:"d M Y" }}</td>
                     <td class="px-6 py-4">
                         <div class="flex justify-center gap-2">
-                            <a href="{% url 'client:user_detail' user_item.pk %}" class="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition"><i class="fa-solid fa-eye"></i></a>
-                            <button class="p-2 hover:bg-red-50 text-red-600 rounded-lg transition"><i class="fa-solid fa-ban"></i></button>
+                            <a href="{% url 'admin_panel:user_detail' user_item.pk %}"
+                               class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 rounded-lg transition" title="Ko'rish">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <form method="post" action="{% url 'admin_panel:user_block' user_item.pk %}"
+                                  onsubmit="return confirm('{% if user_item.is_blocked %}Blokdan chiqarilsinmi?{% else %}Bloklansinmi?{% endif %}')">
+                                {% csrf_token %}
+                                {% if not user_item.is_blocked %}
+                                    <input type="hidden" name="reason" value="Admin tomonidan bloklandi">
+                                {% endif %}
+                                <button type="submit"
+                                        class="p-2 {% if user_item.is_blocked %}hover:bg-green-50 text-green-600{% else %}hover:bg-red-50 text-red-600{% endif %} rounded-lg transition"
+                                        title="{% if user_item.is_blocked %}Blokdan chiqarish{% else %}Bloklash{% endif %}">
+                                    <i class="fa-solid {% if user_item.is_blocked %}fa-lock-open{% else %}fa-ban{% endif %}"></i>
+                                </button>
+                            </form>
                         </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-400 italic">
+                        Foydalanuvchilar topilmadi
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-center gap-2 p-6 border-t border-gray-100 dark:border-gray-700">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}"
+                   class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">← Oldingi</a>
+            {% endif %}
+            <span class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
+                {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}"
+                   class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">Keyingi →</a>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
