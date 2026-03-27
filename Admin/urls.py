@@ -18,4 +18,6 @@ urlpatterns = [
     path('complaints/<int:pk>/',            views.AdminComplaintDetailView.as_view(),  name='complaint_detail'),
     path('complaints/<int:pk>/resolve/',    views.AdminResolveComplaintView.as_view(), name='complaint_resolve'),
     path('settings/',                       views.AdminSettingsView.as_view(),         name='settings'),
+    path('orders/',                         views.AdminOrderListView.as_view(),        name='order_list'),
+    path('services/',                       views.AdminServiceListView.as_view(),      name='service_list'),
 ]

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="py-8 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-white italic tracking-tighter">BUYURTMALAR MONITORINGI</h1>
+            <p class="text-gray-400 text-sm mt-1">Platformadagi barcha oldi-sotdi jarayonlari nazorati.</p>
+        </div>
+        
+        <div class="mt-4 md:mt-0 flex gap-2 overflow-x-auto pb-2">
+            <a href="?status=" class="px-4 py-2 bg-gray-800 text-xs font-bold rounded-xl border border-gray-700 hover:border-blue-500 transition text-white">Hammasi</a>
+            <a href="?status=active" class="px-4 py-2 bg-gray-800 text-xs font-bold rounded-xl border border-gray-700 hover:border-yellow-500 transition text-yellow-500">Jarayonda</a>
+            <a href="?status=completed" class="px-4 py-2 bg-gray-800 text-xs font-bold rounded-xl border border-gray-700 hover:border-green-500 transition text-green-500">Bajarilgan</a>
+            <a href="?status=dispute" class="px-4 py-2 bg-gray-800 text-xs font-bold rounded-xl border border-gray-700 hover:border-red-500 transition text-red-500">Nizoli</a>
+        </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-3xl border border-gray-700 overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-900/50 text-gray-400 text-[10px] uppercase tracking-widest font-black">
+                        <th class="px-6 py-4">ID / Sana</th>
+                        <th class="px-6 py-4">Mijoz va Dasturchi</th>
+                        <th class="px-6 py-4">Xizmat</th>
+                        <th class="px-6 py-4 text-center">Holat</th>
+                        <th class="px-6 py-4 text-right">Summa</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for order in orders %}
+                    <tr class="hover:bg-gray-700/30 transition group">
+                        <td class="px-6 py-4">
+                            <span class="text-white font-bold text-xs block">#{{ order.id }}</span>
+                            <span class="text-gray-500 text-[10px]">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-blue-400 text-xs font-bold">M: @{{ order.client.username }}</span>
+                                <span class="text-purple-400 text-xs font-bold">D: @{{ order.developer.username }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-300 text-xs">
+                            {{ order.service.title|truncatechars:40 }}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase inline-block
+                                {% if order.status == 'active' %}bg-yellow-500/10 text-yellow-500
+                                {% elif order.status == 'completed' %}bg-green-500/10 text-green-500
+                                {% elif order.status == 'dispute' %}bg-red-500/10 text-red-500
+                                {% else %}bg-gray-500/10 text-gray-400{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right font-black text-white italic italic">
+                            {{ order.price|floatformat:0 }} <span class="text-[9px] font-normal not-italic text-gray-500 uppercase">uzs</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500 italic">Buyurtmalar topilmadi.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

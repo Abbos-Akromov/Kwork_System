@@ -6,35 +6,68 @@
 <div class="py-8 max-w-6xl mx-auto">
     <div class="bg-red-600 rounded-3xl p-8 text-white mb-10 shadow-xl shadow-red-500/20">
         <h1 class="text-3xl font-black mb-2 uppercase">Arbitraj Markazi</h1>
-        <p class="text-red-100">Bu yerda siz sudya vazifasini bajarasiz. Har bir dalilni diqqat bilan o'rganing.</p>
+        <p class="text-red-100">Jami nizolar soni: {{ disputes.count }} ta. Har bir dalilni diqqat bilan o'rganing.</p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-red-100 dark:border-gray-700">
-            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                <i class="fa-solid fa-scale-balanced text-red-600"></i> Nizo #{{ complaint.id }}
-            </h3>
-            <div class="space-y-4">
-                <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
-                    <p class="text-xs text-gray-400 uppercase font-bold">Mijoz da'vosi:</p>
-                    <p class="mt-2 italic">"Dasturchi ishni vaqtida topshirmadi va xatolar ko'p..."</p>
-                </div>
-                <div class="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl">
-                    <p class="text-xs text-blue-400 uppercase font-bold">Dasturchi javobi:</p>
-                    <p class="mt-2 italic">"Mijoz qo'shimcha funksiyalar so'radi, lekin pulini to'lamadi..."</p>
-                </div>
-            </div>
-        </div>
+    <div class="space-y-12">
+        {% for order in disputes %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 border-b pb-12 border-gray-200 dark:border-gray-700">
 
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-center text-center">
-            <h3 class="text-xl font-bold mb-6">Yakuniy Qaror</h3>
-            <p class="text-gray-500 text-sm mb-8">Puldagi mablag'ni kimga qaytarmoqchisiz?</p>
-            <div class="grid grid-cols-2 gap-4">
-                <button class="bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-200 dark:shadow-none">Mijozga qaytarish</button>
-                <button class="bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none">Dasturchiga berish</button>
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-red-100 dark:border-gray-700">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced text-red-600"></i> Nizo #{{ order.id }}
+                    <span class="text-sm font-normal text-gray-400">({{ order.service.title }})</span>
+                </h3>
+                <div class="space-y-4">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl">
+                        <p class="text-xs text-gray-400 uppercase font-bold">Mijoz ({{ order.client.get_full_name }}):</p>
+                        <p class="mt-2 italic text-gray-700 dark:text-gray-300">
+                            {{ order.dispute_reason|default:"Mijoz shikoyat matni kiritilmagan." }}
+                        </p>
+                    </div>
+                    <div class="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl">
+                        <p class="text-xs text-blue-400 uppercase font-bold">Dasturchi ({{ order.developer.get_full_name }}):</p>
+                        <p class="mt-2 italic text-gray-700 dark:text-gray-300">
+                            {{ order.developer_explanation|default:"Dasturchi hali tushuntirish bermagan." }}
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center px-2">
+                        <span class="text-sm font-bold text-gray-500">Loyiha qiymati:</span>
+                        <span class="text-lg font-black text-green-600">{{ order.total_price }} UZS</span>
+                    </div>
+                </div>
             </div>
-            <button class="mt-4 py-3 text-sm font-bold text-gray-400 hover:text-red-500">Ikkasiga 50/50 bo'lish</button>
+
+            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-center">
+                <h3 class="text-xl font-bold mb-4 text-center">Yakuniy Qaror</h3>
+
+                <form method="POST" action="{% url 'admin_panel:arbitraj_post' order.pk %}">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Admin izohi (har ikki tomonga yuboriladi):</label>
+                        <textarea name="note" rows="2" class="w-full rounded-xl border-gray-200 dark:bg-gray-900 dark:border-gray-600 p-3 text-sm" placeholder="Qaroringiz sababini yozing..." required></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button type="submit" name="decision" value="refund"
+                                class="bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-lg">
+                            Mijozga qaytarish
+                        </button>
+                        <button type="submit" name="decision" value="release"
+                                class="bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg">
+                            Dasturchiga berish
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
+        {% empty %}
+        <div class="text-center py-20 text-gray-500">
+            <i class="fa-solid fa-circle-check text-5xl mb-4 text-green-500"></i>
+            <p>Hozircha faol nizolar mavjud emas.</p>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

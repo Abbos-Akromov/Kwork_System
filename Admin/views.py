@@ -9,77 +9,80 @@ from django.http import JsonResponse
 
 from Client.models import (
     User, Order, Payment, Complaint, Notification,
-    Service, Review, PlatformSettings,
+    Service, Review, PlatformSettings
 )
+from django.views.generic import ListView
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
 
-class AdminRequiredMixin:
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect('client:login')
-        if not (request.user.is_staff or request.user.is_admin_role):
-            raise PermissionDenied('Faqat adminlar uchun.')
-        return super().dispatch(request, *args, **kwargs)
+class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and (self.request.user.is_staff or self.request.user.role == 'admin')
+
+    def handle_no_permission(self):
+        if not self.request.user.is_authenticated:
+            return redirect('login')
+        messages.error(self.request, "Bu sahifaga kirish uchun admin huquqi kerak.")
+        return redirect('dashboard')
 
 
+# 1. Barcha buyurtmalar monitoringi
+class AdminOrderListView(AdminRequiredMixin, ListView):
+    model = Order
+    template_name = 'admin_panel/order_list.html'
+    context_object_name = 'orders'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = Order.objects.all().order_by('-created_at')
+        status = self.request.GET.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset
 
 
+# 2. Xizmatlar (Gigs) ro'yxati
+class AdminServiceListView(ListView):
+    model = Service
+    template_name = 'admin_panel/service_list.html'
+    context_object_name = 'services'
+    paginate_by = 12
+
+    def get_queryset(self):
+        # Faqat faol va o'chirilmagan xizmatlarni chiqarish
+        return Service.objects.filter(is_active=True).order_by('-created_at')
 
 
-class AdminDashboardView(AdminRequiredMixin, View):
+class AdminDashboardView(View):
     def get(self, request):
-        today = timezone.now().date()
-
-
-        total_users      = User.objects.count()
-        clients_count    = User.objects.filter(role=User.ROLE_CLIENT).count()
-        developers_count = User.objects.filter(role=User.ROLE_DEVELOPER).count()
-        blocked_count    = User.objects.filter(is_blocked=True).count()
-        new_users_today  = User.objects.filter(created_at__date=today).count()
-
-
-        total_orders     = Order.objects.count()
-        active_orders    = Order.objects.filter(status=Order.STATUS_ACTIVE).count()
-        pending_orders   = Order.objects.filter(status=Order.STATUS_PENDING).count()
-        completed_orders = Order.objects.filter(status=Order.STATUS_COMPLETED).count()
-        dispute_orders   = Order.objects.filter(status=Order.STATUS_DISPUTE).count()
-
-
-        total_revenue    = Payment.objects.filter(
-            status=Payment.STATUS_RELEASED
-        ).aggregate(total=Sum('commission_amount'))['total'] or 0
-        hold_amount      = Payment.objects.filter(
-            status=Payment.STATUS_HOLD
-        ).aggregate(total=Sum('amount'))['total'] or 0
-
-
+        total_profit = Order.objects.filter(status='completed').aggregate(Sum('price'))['price__sum'] or 0
+        active_services = Service.objects.filter(is_active=True).count()
+        avg_check = Order.objects.filter(status='completed').aggregate(Avg('price'))['price__avg'] or 0
+        unread_notifications = Notification.objects.filter(is_read=False).count()
+        total_orders = Order.objects.count()
+        clients_count = User.objects.filter(role='client').count()
+        developers_count = User.objects.filter(role='developer').count()
+        blocked_count = User.objects.filter(is_active=False).count()
         pending_complaints = Complaint.objects.filter(status='pending').count()
-        total_complaints   = Complaint.objects.count()
+        hold_amount = Payment.objects.filter(status='held').aggregate(Sum('amount'))['amount__sum'] or 0
+        dispute_orders = Order.objects.filter(status='dispute').count()
+        recent_orders = Order.objects.all().order_by('-created_at')[:10]
 
-
-        recent_orders    = Order.objects.order_by('-created_at').select_related('client', 'developer', 'service')[:5]
-        recent_complaints = Complaint.objects.filter(status='pending').order_by('-created_at')[:5]
-
-        ctx = {
-            'total_users': total_users,
+        context = {
+            'total_profit': total_profit,
+            'active_services_count': active_services,
+            'avg_order_value': avg_check,
+            'unread_notifications': unread_notifications,
+            'total_orders_count': total_orders,
             'clients_count': clients_count,
             'developers_count': developers_count,
             'blocked_count': blocked_count,
-            'new_users_today': new_users_today,
-            'total_orders': total_orders,
-            'active_orders': active_orders,
-            'pending_orders': pending_orders,
-            'completed_orders': completed_orders,
-            'dispute_orders': dispute_orders,
-            'total_revenue': total_revenue,
-            'hold_amount': hold_amount,
             'pending_complaints': pending_complaints,
-            'total_complaints': total_complaints,
+            'hold_amount': hold_amount,
+            'dispute_orders': dispute_orders,
             'recent_orders': recent_orders,
-            'recent_complaints': recent_complaints,
         }
-        return render(request, 'admin_panel/dashboard.html', ctx)
-
+        return render(request, 'admin_panel/dashboard.html', context)
 
 
 class AdminUserListView(AdminRequiredMixin, View):

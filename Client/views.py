@@ -135,6 +135,9 @@ class LogoutView(View):
 @login_required
 def dashboard(request):
     user = request.user
+    if user.is_staff or user.role == 'admin':
+        return redirect('admin_panel:dashboard')
+
     ctx = {}
 
     if user.is_client:

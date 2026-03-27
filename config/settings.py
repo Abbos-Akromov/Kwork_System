@@ -63,7 +63,7 @@ DATABASES = {
 AUTH_USER_MODEL = 'Client.User'
 
 AUTHENTICATION_BACKENDS = [
-    'Client.backends.EmailBackend',  # ← YANGI: email bilan login
+    'Client.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 

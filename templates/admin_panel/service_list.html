@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="py-8 px-4">
+    <div class="mb-10">
+        <h1 class="text-3xl font-black text-white italic tracking-tighter">FAOL XIZMATLAR</h1>
+        <p class="text-gray-400 text-sm">Dasturchilar tomonidan taklif qilinayotgan barcha xizmat paketlari.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for service in services %}
+        <div class="bg-gray-800 rounded-3xl border border-gray-700 overflow-hidden hover:border-blue-500/50 transition-all group shadow-lg">
+            <div class="h-40 bg-gray-900 relative">
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition">
+                {% else %}
+                    <div class="flex items-center justify-center h-full">
+                        <i class="fa-solid fa-code text-gray-700 text-4xl"></i>
+                    </div>
+                {% endif %}
+                <div class="absolute top-3 right-3 bg-gray-900/80 px-2 py-1 rounded-lg text-[10px] text-blue-400 font-bold">
+                    {{ service.category.name }}
+                </div>
+            </div>
+
+            <div class="p-5">
+                <h3 class="text-white font-bold text-sm leading-tight mb-2 group-hover:text-blue-400 transition">
+                    {{ service.title|truncatechars:50 }}
+                </h3>
+                
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-6 h-6 bg-gray-700 rounded-full overflow-hidden">
+                        </div>
+                    <span class="text-gray-400 text-[10px]">@{{ service.developer.username }}</span>
+                </div>
+
+                <div class="flex justify-between items-center pt-4 border-t border-gray-700">
+                    <span class="text-gray-500 text-[10px] uppercase font-bold tracking-widest italic">Boshlanish narxi:</span>
+                    <span class="text-white font-black italic">{{ service.price|floatformat:0 }} <span class="text-[9px] font-normal not-italic text-gray-500">UZS</span></span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-20 text-center">
+            <p class="text-gray-500 italic">Hozircha hech qanday faol xizmat mavjud emas.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <div class="mt-10 flex justify-center gap-2">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="p-3 bg-gray-800 border border-gray-700 rounded-xl text-white hover:bg-gray-700 transition"><i class="fa-solid fa-chevron-left text-xs"></i></a>
+        {% endif %}
+        <span class="px-6 py-3 bg-gray-800 border border-gray-700 rounded-xl text-blue-400 font-bold text-xs">
+            Sahifa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="p-3 bg-gray-800 border border-gray-700 rounded-xl text-white hover:bg-gray-700 transition"><i class="fa-solid fa-chevron-right text-xs"></i></a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
