@@ -397,7 +397,7 @@ class Message(models.Model):
 
     class Meta:
         verbose_name = 'Xabar'
-        verbose_name_plural = 'Xabarlar'
+        verbose_name_plural = 'Xabarlar'    
         ordering = ['created_at']
 
     def __str__(self):

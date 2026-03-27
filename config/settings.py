@@ -30,6 +30,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'Admin.middleware.AdminAccessMiddleware',  # ← YANGI QATOR
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -59,14 +60,12 @@ DATABASES = {
     }
 }
 
-
-
 AUTH_USER_MODEL = 'Client.User'
 
 AUTHENTICATION_BACKENDS = [
+    'Client.backends.EmailBackend',  # ← YANGI: email bilan login
     'django.contrib.auth.backends.ModelBackend',
 ]
-
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
@@ -85,7 +84,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-import os
 STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
