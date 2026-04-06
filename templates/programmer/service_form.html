@@ -6,28 +6,44 @@
 <div class="py-10 max-w-4xl mx-auto px-4">
     <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 shadow-sm border border-gray-100 dark:border-gray-700">
         <h1 class="text-3xl font-black italic uppercase mb-10">{% if form.instance.pk %}Xizmatni tahrirlash{% else %}Xizmat yaratish{% endif %}</h1>
-        
-        <form method="post" enctype="multipart/form-data" class="space-y-8">
+
+        {% if form.errors %}
+        <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl text-red-600 text-sm">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <p>⚠ {{ field }}: {{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-8">
             {% csrf_token %}
-            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="md:col-span-2 flex flex-col">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Xizmat nomi (masalan: "Telegram bot yarataman")</label>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Xizmat nomi</label>
                     {{ form.title }}
                 </div>
-
                 <div class="flex flex-col">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Boshlang'ich narx (UZS)</label>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Narx (so'm)</label>
                     {{ form.price }}
                 </div>
-
                 <div class="flex flex-col">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Muqova rasmi (URL yoki Fayl)</label>
-                    {{ form.image }}
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Muddat (kun)</label>
+                    {{ form.duration_days }}
                 </div>
-
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Kategoriya</label>
+                    {{ form.category }}
+                </div>
+                <div class="flex flex-col justify-center">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        {{ form.is_active }}
+                        <span class="text-sm font-bold">Faol (ko'rinadigan)</span>
+                    </label>
+                </div>
                 <div class="md:col-span-2 flex flex-col">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Batafsil ma'lumot (Mijoz nima oladi?)</label>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Batafsil ma'lumot</label>
                     {{ form.description }}
                 </div>
             </div>
@@ -36,7 +52,7 @@
                 <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black transition shadow-lg shadow-blue-500/20">
                     Saqlash va e'lon qilish
                 </button>
-                <a href="{% url 'client:programmer_dashboard' %}" class="px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl font-bold hover:bg-gray-200 transition">
+                <a href="{% url 'programmer:service_list' %}" class="px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl font-bold hover:bg-gray-200 transition">
                     Bekor qilish
                 </a>
             </div>
@@ -46,22 +62,13 @@
 
 <style>
     input, textarea, select {
-        width: 100%;
-        padding: 1rem;
-        border-radius: 1.25rem;
-        border: 2px solid #f8fafc;
-        background-color: #f8fafc;
-        outline: none;
-        transition: all 0.3s;
+        width: 100%; padding: 1rem; border-radius: 1.25rem;
+        border: 2px solid #f8fafc; background-color: #f8fafc;
+        outline: none; transition: all 0.3s;
     }
     .dark input, .dark textarea, .dark select {
-        background-color: #111827;
-        border-color: #111827;
-        color: white;
+        background-color: #111827; border-color: #111827; color: white;
     }
-    input:focus, textarea:focus {
-        border-color: #3b82f6;
-        background-color: transparent;
-    }
+    input:focus, textarea:focus { border-color: #3b82f6; background-color: transparent; }
 </style>
 {% endblock %}

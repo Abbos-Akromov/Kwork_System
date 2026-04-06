@@ -12,19 +12,98 @@
             </div>
             <p class="text-sm text-gray-500 italic">{{ order.created_at|date:"d F, Y | H:i" }}</p>
         </div>
-        <div class="flex gap-2">
-            <button class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition">Shikoyat qilish</button>
-            {% if order.status == 'completed' %}
-                <a href="{% url 'client:review_create' %}?order={{ order.id }}" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition">Fikr qoldirish</a>
+        <div class="flex gap-2 flex-wrap">
+            {% if user == order.developer and order.status == 'pending' %}
+            <form method="post" action="{% url 'client:order_accept' order.pk %}" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="deadline_days" value="7">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-700 transition">
+                    ✅ Qabul qilish
+                </button>
+            </form>
+            <form method="post" action="{% url 'client:order_reject' order.pk %}" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="reason" value="Rad etildi">
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700 transition">
+                    ❌ Rad etish
+                </button>
+            </form>
             {% endif %}
+
+            {% if user == order.developer and order.status in 'active,revision' %}
+                <button onclick="document.getElementById('deliverModal').classList.remove('hidden')"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 transition">
+                    📦 Ishni topshirish
+                </button>
+                <div id="deliverModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+                        <h3 class="font-black text-xl mb-6">Ishni topshirish</h3>
+                        <form method="post" action="{% url 'client:order_deliver' order.pk %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-xs font-black text-gray-400 uppercase mb-2 block">Fayl yuklash</label>
+                                    <input type="file" name="delivery_file" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-black text-gray-400 uppercase mb-2 block">Yoki URL kiriting</label>
+                                    <input type="url" name="delivery_url" placeholder="https://github.com/..." class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-black text-gray-400 uppercase mb-2 block">Izoh</label>
+                                    <textarea name="message" rows="3" placeholder="Ish haqida qisqacha..." class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600"></textarea>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 mt-6">
+                                <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-black hover:bg-blue-700 transition">
+                                    📦 Topshirish
+                                </button>
+                                <button type="button" onclick="document.getElementById('deliverModal').classList.add('hidden')"
+                                    class="px-6 py-3 bg-gray-100 dark:bg-gray-700 rounded-xl font-bold hover:bg-gray-200 transition">
+                                    Bekor
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+            {% if user == order.client and order.status == 'delivered' %}
+            <form method="post" action="{% url 'client:order_complete' order.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-700 transition">
+                    ✅ Tasdiqlash
+                </button>
+            </form>
+            <form method="post" action="{% url 'client:order_revision' order.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="reason" value="Tuzatish kerak">
+                <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-yellow-600 transition">
+                    🔄 Tuzatish
+                </button>
+            </form>
+            {% endif %}
+
+            {% if order.status == 'completed' and user == order.client %}
+            <a href="{% url 'client:review_create' order.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-yellow-600 transition">
+                ⭐ Fikr qoldirish
+            </a>
+            {% endif %}
+
+            {% if order.status not in 'completed,cancelled,refunded' %}
+            <a href="{% url 'client:complaint_create' %}" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition">
+                Shikoyat qilish
+            </a>
+            {% endif %}
+
         </div>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 mb-8 border border-gray-100 dark:border-gray-700 shadow-sm">
         <div class="relative flex justify-between">
             <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-100 dark:bg-gray-700 -translate-y-1/2 z-0"></div>
-            <div class="absolute top-1/2 left-0 h-1 bg-blue-600 -translate-y-1/2 z-0 transition-all duration-500" style="width: 33%"></div>
-            
+            <div class="absolute top-1/2 left-0 h-1 bg-blue-600 -translate-y-1/2 z-0 transition-all duration-500"
+                style="width: {% if order.status == 'pending' %}0%{% elif order.status == 'active' %}33%{% elif order.status == 'delivered' %}66%{% elif order.status == 'completed' %}100%{% else %}0%{% endif %}"></div>
             <div class="relative z-10 text-center">
                 <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-check text-xs"></i></div>
                 <p class="text-[10px] font-bold uppercase dark:text-gray-400">Yaratildi</p>
@@ -62,17 +141,17 @@
         <div class="space-y-6">
             <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm text-center">
                 <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Buyurtma qiymati</p>
-                <h2 class="text-3xl font-black text-blue-600 mb-6">{{ order.amount }} <span class="text-sm">UZS</span></h2>
+                <h2 class="text-3xl font-black text-blue-600 mb-6">{{ order.price|floatformat:2 }} <span class="text-sm">UZS</span></h2>
                 
                 <div class="border-t dark:border-gray-700 pt-6">
                     <p class="text-xs text-gray-400 font-bold uppercase mb-4">Ijrochi</p>
                     <div class="flex items-center justify-center gap-3">
                         <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-600">
-                            {{ order.service.author.username|first|upper }}
+                            {{ order.service.developer.username|first|upper }}
                         </div>
                         <div class="text-left">
-                            <p class="font-bold text-sm">{{ order.service.author.username }}</p>
-                            <a href="{% url 'client:profile_detail' order.service.author.pk %}" class="text-[10px] text-blue-600 font-bold hover:underline">Profilni ko'rish</a>
+                            <p class="font-bold text-sm">{{ order.service.developer.username }}</p>
+                            <a href="{% url 'client:profile_detail' order.service.developer.username %}" class="text-[10px] text-blue-600 font-bold hover:underline">Profilni ko'rish</a>
                         </div>
                     </div>
                 </div>

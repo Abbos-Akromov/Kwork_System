@@ -191,7 +191,7 @@ class Order(models.Model):
     def reject(self, reason: str):
         self.status = self.STATUS_CANCELLED
         self.cancel_reason = reason
-        self.cancelled_at = __import__('django.utils.timezone', fromlist=['timezone']).timezone.now()
+        self.cancelled_at = __import__('django.utils.timezone', fromlist=['timezone']).now()
         self.save()
 
     def deliver(self):
@@ -354,8 +354,11 @@ class Review(models.Model):
 
     def clean(self):
         from django.core.exceptions import ValidationError
-        if self.order.status != Order.STATUS_COMPLETED:
-            raise ValidationError('Faqat tugallangan buyurtmaga sharh qoldirish mumkin.')
+        try:
+            if self.order and self.order.status != Order.STATUS_COMPLETED:
+                raise ValidationError('Faqat tugallangan buyurtmaga sharh qoldirish mumkin.')
+        except Order.DoesNotExist:
+            pass
         if not (1 <= self.rating <= 5):
             raise ValidationError('Reyting 1 dan 5 gacha bo\'lishi kerak.')
 

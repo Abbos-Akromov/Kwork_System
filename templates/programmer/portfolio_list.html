@@ -1,30 +1,62 @@
 {% extends 'base.html' %}
 
-{% block title %}Portfolio Ro'yxati{% endblock %}
-
 {% block content %}
-<div class="py-10">
-    <div class="flex justify-between items-center mb-10">
-        <h1 class="text-3xl font-black italic uppercase">Portfolio (Barcha ishlar)</h1>
-        <a href="{% url 'client:portfolio_create' %}" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold text-sm">+ Yangi loyiha</a>
+<div class="py-12 max-w-6xl mx-auto px-4">
+    <div class="flex justify-between items-center mb-12">
+        <h1 class="text-3xl font-black italic uppercase text-gray-900 dark:text-white">Portfolio</h1>
+        {% if request.user.is_developer %}
+        <a href="{% url 'programmer:portfolio_create' %}" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all hover:bg-blue-700">
+            + Yangi loyiha
+        </a>
+        {% endif %}
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for item in portfolios %}
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm relative group">
-            <div class="h-48 rounded-2xl bg-gray-100 dark:bg-gray-700 mb-4 overflow-hidden">
-                {% if item.image %}<img src="{{ item.image.url }}" class="w-full h-full object-cover">{% endif %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for item in items %}
+        <div class="bg-white dark:bg-[#1e293b] rounded-[2.5rem] p-5 border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all group">
+
+            <a href="{% url 'programmer:portfolio_detail' item.pk %}" class="block">
+                <div class="h-48 rounded-[1.5rem] bg-gray-50 dark:bg-slate-900 mb-5 overflow-hidden relative">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-gray-200">
+                            <i class="fa-solid fa-code text-5xl"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <h4 class="font-bold text-gray-900 dark:text-white text-lg mb-1 truncate group-hover:text-blue-600 transition-colors">
+                    {{ item.title }}
+                </h4>
+            </a>
+
+            <p class="text-[10px] text-blue-600 font-black uppercase tracking-widest mb-4">
+                {{ item.category|default:"Dasturlash" }}
+            </p>
+
+            {% if request.user == item.developer %}
+            <div class="flex gap-3 pt-5 border-t border-gray-50 dark:border-slate-800/50">
+                <a href="{% url 'programmer:portfolio_edit' item.pk %}" class="flex-1 py-3 text-center bg-gray-50 dark:bg-slate-800/50 rounded-xl text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-slate-400 hover:bg-blue-600 hover:text-white transition-all">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> Tahrirlash
+                </a>
+
+                <form action="{% url 'programmer:portfolio_delete' item.pk %}" method="POST" class="flex-1">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Haqiqatdan ham ushbu loyihani o\'chirmoqchimisiz?')" class="w-full py-3 text-center bg-gray-50 dark:bg-slate-800/50 rounded-xl text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-slate-400 hover:bg-red-600 hover:text-white transition-all">
+                        <i class="fa-solid fa-trash-can mr-1"></i> O'chirish
+                    </button>
+                </form>
             </div>
-            <h4 class="font-bold text-gray-800 dark:text-white">{{ item.title }}</h4>
-            <p class="text-xs text-gray-400 mt-1 mb-4">{{ item.category }}</p>
-            
-            <div class="flex gap-2">
-                <a href="{% url 'client:portfolio_update' item.pk %}" class="flex-1 py-2 text-center bg-gray-50 dark:bg-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 hover:text-blue-600 transition">Tahrirlash</a>
-                <a href="{% url 'client:portfolio_delete' item.pk %}" class="flex-1 py-2 text-center bg-gray-50 dark:bg-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-50 hover:text-red-600 transition">O'chirish</a>
+            {% else %}
+            <div class="pt-4 border-t border-gray-50 dark:border-slate-800/50 flex items-center gap-2">
+                <div class="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-[8px] font-black text-blue-600">
+                    {{ item.developer.username|first|upper }}
+                </div>
+                <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Dasturchi: @{{ item.developer.username }}</span>
             </div>
+            {% endif %}
+
         </div>
-        {% empty %}
-        <div class="col-span-full py-20 text-center text-gray-400 italic">Hech qanday ish topilmadi.</div>
         {% endfor %}
     </div>
 </div>

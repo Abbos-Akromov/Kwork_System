@@ -38,7 +38,7 @@ class RegisterView(View):
             user = form.save(commit=False)
             user.is_active = True
             user.save()
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, 'Xush kelibsiz!')
             return redirect('client:dashboard')
         return render(request, 'auth/register.html', {'form': form})
@@ -98,8 +98,7 @@ class LoginView(View):
             user = authenticate(
                 request,
                 email=user_obj.email,
-                password=password,
-                backend='django.contrib.auth.backends.ModelBackend'
+                password=password
             )
 
             if user is not None:
@@ -129,6 +128,20 @@ class LogoutView(View):
     def post(self, request):
         auth_logout(request)
         return redirect('client:login')
+
+
+def home_view(request):
+    """Barcha uchun ochiq landing page (Kwork uslubida)."""
+    categories = Category.objects.filter(is_active=True)[:12]
+    # Mashhur xizmatlar: statusi active bo'lgan, eng ko'p ko'rilgan 8 ta xizmat
+    popular_services = Service.objects.filter(is_active=True).select_related('developer', 'category').order_by('-views_count')[:8]
+    
+    context = {
+        'categories': categories,
+        'popular_services': popular_services,
+    }
+    return render(request, 'home.html', context)
+
 
 
 
@@ -189,11 +202,17 @@ class ProfileDetailView(View):
     def get(self, request, username):
         profile = get_object_or_404(User, username=username)
         ctx = {'target_user': profile}
+
         if profile.is_developer:
-            ctx['services']   = Service.objects.filter(developer=profile, is_active=True)
-            ctx['portfolio']  = PortfolioItem.objects.filter(developer=profile)
-            ctx['reviews']    = Review.objects.filter(developer=profile).order_by('-created_at')[:10]
+            orders = Order.objects.filter(developer=profile)
+
+            ctx['completed_orders'] = orders.filter(status='completed')
+            ctx['in_progress_orders'] = orders.filter(status='in_progress')
+            ctx['returned_orders'] = orders.filter(status='returned')
+
+            ctx['reviews'] = Review.objects.filter(developer=profile).order_by('-created_at')[:10]
             ctx['avg_rating'] = Review.objects.filter(developer=profile).aggregate(avg=Avg('rating'))['avg']
+
         return render(request, 'users/profile_detail.html', ctx)
 
 
@@ -307,6 +326,8 @@ class OrderCreateView(View):
         return redirect('client:service_detail', pk=service_id)
 
     def get(self, request, service_id):
+        if not request.user.is_authenticated:
+            return redirect('client:login')
         service = get_object_or_404(Service, pk=service_id, is_active=True)
         return render(request, 'orders/create.html', {
             'service': service, 'form': OrderCreateForm()
@@ -403,6 +424,10 @@ class OrderDeliverView(View):
             )
             order.deliver()
             messages.success(request, 'Ish topshirildi!')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
         return redirect('client:order_detail', pk=pk)
 
 
@@ -425,6 +450,10 @@ class OrderRevisionView(View):
         if form.is_valid():
             order.request_revision(form.cleaned_data['reason'])
             messages.info(request, 'Tuzatish so\'raldi.')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
         return redirect('client:order_detail', pk=pk)
 
 
@@ -638,6 +667,7 @@ class ComplaintCreateView(View):
                 return render(request, 'complaints/create.html', {'form': form})
             complaint = form.save(commit=False)
             complaint.reporter = request.user
+
             complaint.save()
             messages.success(request, 'Shikoyat yuborildi. Admin ko\'rib chiqadi.')
             return redirect('client:dashboard')
@@ -652,20 +682,25 @@ class ComplaintListView(View):
         return render(request, 'complaints/list.html', {'complaints': complaints})
 
 
-
 class NotificationListView(View):
     def get(self, request):
         if not request.user.is_authenticated:
             return redirect('client:login')
+
         notifs = Notification.objects.filter(recipient=request.user).order_by('-created_at')
         filter_type = request.GET.get('filter')
         if filter_type == 'unread':
             notifs = notifs.filter(is_read=False)
+
         from django.core.paginator import Paginator
         paginator = Paginator(notifs, 20)
         page = request.GET.get('page')
         page_obj = paginator.get_page(page)
-        return render(request, 'notifications/list.html', {'page_obj': page_obj, 'notifications': page_obj})
+
+        return render(request, 'notifications/list.html', {
+            'page_obj': page_obj,
+            'notifications': page_obj
+        })
 
 
 class MarkNotificationRead(View):

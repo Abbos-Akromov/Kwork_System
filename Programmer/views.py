@@ -118,15 +118,20 @@ class ServiceDeleteView(View):
 
 
 
+# Portfolio Ro'yxati - Hamma ko'ra oladi
 class PortfolioListView(View):
-    @method_decorator(developer_required)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
+    # Bu yerdan @method_decorator(developer_required) olib tashlandi!
     def get(self, request):
-        items = PortfolioItem.objects.filter(developer=request.user).order_by('order', '-created_at')
+        # .all() qilsak, bazadagi barcha dasturchilarning loyihalari chiqadi
+        items = PortfolioItem.objects.all().order_by('order', '-created_at')
         return render(request, 'programmer/portfolio_list.html', {'items': items})
 
+# Portfolio Ichki Sahifasi - Hamma ko'ra oladi
+class PortfolioDetailView(View):
+    # Bu yerda ham cheklov yo'q
+    def get(self, request, pk):
+        item = get_object_or_404(PortfolioItem, pk=pk)
+        return render(request, 'programmer/portfolio_detail.html', {'item': item})
 
 class PortfolioCreateView(View):
     @method_decorator(developer_required)
@@ -155,6 +160,7 @@ class PortfolioUpdateView(View):
         return super().dispatch(*args, **kwargs)
 
     def get(self, request, pk):
+        # Faqat o'ziga tegishli loyihani olish (Xavfsizlik!)
         item = get_object_or_404(PortfolioItem, pk=pk, developer=request.user)
         return render(request, 'programmer/portfolio_form.html', {
             'form': PortfolioForm(instance=item),
@@ -163,13 +169,14 @@ class PortfolioUpdateView(View):
         })
 
     def post(self, request, pk):
+        # Faqat o'ziga tegishli loyihani yangilash
         item = get_object_or_404(PortfolioItem, pk=pk, developer=request.user)
         form = PortfolioForm(request.POST, request.FILES, instance=item)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Portfolio yangilandi.')
+            messages.success(request, 'Loyiha muvaffaqiyatli yangilandi.')
             return redirect('programmer:portfolio_list')
-        return render(request, 'programmer/portfolio_form.html', {'form': form, 'title': 'Tahrirlash', 'item': item})
+        return render(request, 'programmer/portfolio_form.html', {'form': form, 'item': item})
 
 
 class PortfolioDeleteView(View):
@@ -178,7 +185,8 @@ class PortfolioDeleteView(View):
         return super().dispatch(*args, **kwargs)
 
     def post(self, request, pk):
+        # Faqat o'ziga tegishli loyihani o'chirish (Xavfsizlik!)
         item = get_object_or_404(PortfolioItem, pk=pk, developer=request.user)
         item.delete()
-        messages.success(request, 'Portfolio element o\'chirildi.')
+        messages.success(request, 'Loyiha o\'chirildi.')
         return redirect('programmer:portfolio_list')

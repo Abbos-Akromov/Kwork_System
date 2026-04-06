@@ -193,15 +193,18 @@ class OrderCancelForm(forms.Form):
 
 class DeliveryForm(forms.Form):
     delivery_file = forms.FileField(
-        required=False, label='Fayl yuklash',
+        required=False,
+        label='Fayl yuklash',
         widget=forms.FileInput(attrs={'class': 'form-control'})
     )
-    delivery_url = forms.URLField(
-        required=False, label='URL (GitHub, drive va h.k.)',
-        widget=forms.URLInput(attrs={'class': 'form-control'})
+    delivery_url = forms.CharField(
+        required=False,
+        label='URL (GitHub, drive va h.k.)',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'https://github.com/...'})
     )
     message = forms.CharField(
-        required=False, label='Izoh',
+        required=False,
+        label='Izoh',
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
     )
 

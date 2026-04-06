@@ -58,7 +58,8 @@ class AdminDashboardView(View):
         total_profit = Order.objects.filter(status='completed').aggregate(Sum('price'))['price__sum'] or 0
         active_services = Service.objects.filter(is_active=True).count()
         avg_check = Order.objects.filter(status='completed').aggregate(Avg('price'))['price__avg'] or 0
-        unread_notifications = Notification.objects.filter(is_read=False).count()
+        unread_notifications = Notification.objects.filter(
+            recipient=request.user, is_read=False).count()
         total_orders = Order.objects.count()
         clients_count = User.objects.filter(role='client').count()
         developers_count = User.objects.filter(role='developer').count()

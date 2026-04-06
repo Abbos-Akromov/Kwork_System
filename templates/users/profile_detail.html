@@ -6,14 +6,14 @@
 <div class="py-10 max-w-6xl mx-auto px-4">
     <div class="bg-white dark:bg-gray-800 rounded-[2rem] p-8 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden mb-8">
         <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-10"></div>
-        
+
         <div class="relative flex flex-col md:flex-row items-center md:items-end gap-6">
             <div class="w-32 h-32 bg-white dark:bg-gray-700 p-1 rounded-3xl shadow-lg -mt-4">
                 <div class="w-full h-full bg-blue-100 dark:bg-gray-600 rounded-2xl flex items-center justify-center text-4xl font-bold text-blue-600">
                     {{ target_user.username|first|upper }}
                 </div>
             </div>
-            
+
             <div class="flex-1 text-center md:text-left">
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
                     <h1 class="text-3xl font-black">{{ target_user.get_full_name|default:target_user.username }}</h1>
@@ -21,8 +21,11 @@
                         <i class="fa-solid fa-circle-check text-blue-500 text-xl" title="Tasdiqlangan"></i>
                     {% endif %}
                 </div>
-                <p class="text-gray-500 dark:text-gray-400 font-medium">@{{ target_user.username }} • <span class="italic">A'zo bo'ldi: {{ target_user.date_joined|date:"Y-yil" }}</span></p>
-            </div>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">
+                        @{{ target_user.username }} •
+                        <span class="italic">A'zo bo'ldi: {{ target_user.date_joined|date:"d.m.Y" }}</span>
+                    </p>
+                </div>
 
             {% if user == target_user %}
             <div class="flex gap-3">
@@ -52,19 +55,21 @@
                 </div>
             </div>
 
+            {% if target_user.is_developer %}
             <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700">
                 <h3 class="font-bold mb-4">Statistika</h3>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl text-center">
-                        <p class="text-2xl font-black text-blue-600">24</p>
+                        <p class="text-2xl font-black text-blue-600">{{ completed_orders.count|default:"0" }}</p>
                         <p class="text-[10px] text-gray-500 uppercase font-bold">Buyurtmalar</p>
                     </div>
                     <div class="p-4 bg-green-50 dark:bg-green-900/10 rounded-2xl text-center">
-                        <p class="text-2xl font-black text-green-600">4.9</p>
+                        <p class="text-2xl font-black text-green-600">{{ avg_rating|default:0|floatformat:1 }}</p>
                         <p class="text-[10px] text-gray-500 uppercase font-bold">Reyting</p>
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
 
         <div class="lg:col-span-2 space-y-6">
@@ -75,14 +80,75 @@
                 </p>
             </div>
 
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold uppercase tracking-widest italic">Portfolio</h3>
-                <a href="#" class="text-sm text-blue-600 font-bold">Hammasi →</a>
+            {% if target_user.is_developer %}
+            <div x-data="{ tab: 'completed' }" class="space-y-6">
+                <div class="flex justify-between items-end mb-2">
+                    <div>
+                        <div class="flex items-center gap-4">
+                            <h3 class="text-xl font-bold uppercase tracking-widest italic text-white">Portfolio</h3>
+                        </div>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase mt-1">Sizning barcha loyihalaringiz</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button @click="tab = 'completed'"
+                            :class="tab === 'completed' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-gray-800 text-gray-500'"
+                            class="px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-tighter transition-all">
+                            Topshirilganlar ({{ completed_orders.count|default:"0" }})
+                        </button>
+                        <button @click="tab = 'progress'"
+                            :class="tab === 'progress' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'bg-gray-800 text-gray-500'"
+                            class="px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-tighter transition-all">
+                            Jarayonda ({{ in_progress_orders.count|default:"0" }})
+                        </button>
+                    </div>
+                </div>
+
+                <div x-show="tab === 'completed'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <a href="{% url 'programmer:portfolio_list' %}" class="group relative bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-8 flex flex-col items-center justify-center shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95 min-h-[200px]">
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-white/20 transition-all">
+                            <i class="fa-solid fa-briefcase text-white text-3xl"></i>
+                        </div>
+                        <p class="text-white text-xs font-black uppercase tracking-widest">Loyihalarni ko'rish</p>
+                        <p class="text-blue-100/60 text-[8px] mt-2 font-bold uppercase italic">Barcha shaxsiy loyihalar va ishlar</p>
+                    </a>
+
+                    {% for order in completed_orders %}
+                    <div class="group relative bg-[#1e293b] rounded-[2rem] p-5 border border-slate-800 hover:border-blue-500/50 transition-all duration-300">
+                        <div class="aspect-video bg-slate-900 rounded-2xl flex items-center justify-center mb-4 overflow-hidden relative border border-slate-800">
+                            <i class="fa-solid fa-check-double text-4xl text-blue-500 opacity-20 group-hover:opacity-40 transition-opacity"></i>
+                            <div class="absolute inset-0 bg-blue-600/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm">
+                                <a href="{% url 'client:order_detail' order.id %}" class="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-2xl">Ishni ko'rish</a>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-white group-hover:text-blue-400 transition-colors truncate">{{ order.service.title }}</h4>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-[9px] text-slate-500 font-bold uppercase italic">{{ order.completed_at|date:"d.m.Y" }}</span>
+                            <span class="text-[10px] font-black text-green-500">{{ order.price }} UZS</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div x-show="tab === 'progress'" class="grid grid-cols-1 md:grid-cols-2 gap-6" style="display: none;">
+                    {% for order in in_progress_orders %}
+                    <div class="bg-slate-800/40 rounded-[2rem] p-6 border border-orange-500/20 text-gray-900 dark:text-white">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-500">
+                                <i class="fa-solid fa-spinner fa-spin"></i>
+                            </div>
+                            <span class="text-[8px] bg-orange-500/20 text-orange-500 px-2 py-1 rounded-full font-black uppercase">Active</span>
+                        </div>
+                        <h4 class="font-bold text-white mb-1">{{ order.service.title }}</h4>
+                        <p class="text-[10px] text-slate-500 uppercase font-bold">Mijoz: {{ order.client.username }}</p>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-full py-16 text-center bg-slate-800/20 rounded-[2rem] border-2 border-dashed border-slate-800 text-slate-500 italic">
+                        Hozirda jarayonda ishlar yo'q.
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-gray-200 dark:bg-gray-700 aspect-video rounded-2xl flex items-center justify-center text-gray-400 italic">Namuna loyiha #1</div>
-                <div class="bg-gray-200 dark:bg-gray-700 aspect-video rounded-2xl flex items-center justify-center text-gray-400 italic">Namuna loyiha #2</div>
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>
